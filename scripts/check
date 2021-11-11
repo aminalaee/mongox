@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+set -x
+
+export SOURCE_FILES="mongox tests"
+
+poetry run isort --check --diff --project=mongox $SOURCE_FILES
+poetry run black --check --diff $SOURCE_FILES
+poetry run flake8 $SOURCE_FILES
+poetry run mypy $SOURCE_FILES

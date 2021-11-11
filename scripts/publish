@@ -1,0 +1,6 @@
+#!/bin/sh -e
+
+set -x
+
+poetry publish --username $PYPI_USERNAME --password $PYPI_TOKEN
+poetry run mkdocs gh-deploy --force

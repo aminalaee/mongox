@@ -1,0 +1,9 @@
+#!/bin/sh -e
+
+set -x
+
+export SOURCE_FILES="mongox tests"
+
+poetry run autoflake --in-place --recursive $SOURCE_FILES
+poetry run isort --project=orm $SOURCE_FILES
+poetry run black $SOURCE_FILES

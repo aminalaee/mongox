@@ -1,0 +1,21 @@
+site_name: MongoX
+site_description: Python MongoDB Object-Document-Mapper based on Motor and Pydantic
+
+theme:
+    name: 'material'
+
+repo_name: aminalaee/mongox
+repo_url: https://github.com/aminalaee/mongox
+
+nav:
+    - Quickstart: 'index.md'
+    - Usage:
+      - Defining documents: 'defining_documents.md'
+      - Working with documents: 'queriying_documents.md'
+
+markdown_extensions:
+  - mkautodoc
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.tabbed
+  - pymdownx.superfences
