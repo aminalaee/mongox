@@ -34,8 +34,6 @@ jobs:
         run: "python -m poetry install"
       - name: "Run linting checks"
         run: "python -m poetry run bash scripts/check"
-      - name: "Build package & docs"
-        run: "python -m poetry run bash scripts/build"
       - name: "Run tests"
         env:
           DATABASE_URI: "mongodb://localhost:27017"
