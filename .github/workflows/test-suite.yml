@@ -45,4 +45,5 @@ jobs:
       - name: "Upload Coverage"
         uses: codecov/codecov-action@v2
         with:
-          veerbose: true
+          verbose: true
+          files: .coverage
