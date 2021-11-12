@@ -30,17 +30,17 @@ jobs:
       - name: "Install Poetry"
         run: "curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -"
       - name: "Install dependencies"
-        run: "poetry install"
+        run: "python -m poetry install"
       - name: "Run linting checks"
-        run: "scripts/check"
+        run: "python -m poetry run bash scripts/check"
       - name: "Build package & docs"
-        run: "scripts/build"
+        run: "python -m poetry run bash scripts/build"
       - name: "Run tests"
         env:
           DATABASE_URI: "mongodb://localhost:27017"
-        run: "scripts/test"
+        run: "python -m poetry run bash scripts/test"
       - name: "Enforce coverage"
-        run: "scripts/coverage"
+        run: "python -m poetry run bash scripts/coverage"
       - name: "Upload Coverage"
         uses: codecov/codecov-action@v2
         with:

@@ -5,7 +5,7 @@
     <img src="https://github.com/aminalaee/mongox/workflows/Test%20Suite/badge.svg" alt="Build Status">
 </a>
 <a href="https://github.com/aminalaee/mongox/actions">
-    <img src="https://github.com/aminalaee/mongox/workflows/publish/badge.svg" alt="Publish Status">
+    <img src="https://github.com/aminalaee/mongox/workflows/Publish/badge.svg" alt="Publish Status">
 </a>
 <a href="https://codecov.io/gh/aminalaee/mongox">
     <img src="https://codecov.io/gh/aminalaee/mongox/branch/main/graph/badge.svg" alt="Coverage">
