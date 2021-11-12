@@ -21,7 +21,7 @@ which is built on top [Motor][motor] and [Pydantic][pydantic].
 The main features include:
 
 * Fully type annotated
-* Async support Python 3.6+ (since it's built on top of Motor)
+* Async support Python 3.7+ (since it's built on top of Motor)
 * Elegant editor support (since it's built on top of Pydantic)
 * Autocompletion everywhere, from object creation to query results
 * Custom query builder which is more intuitive and pythonic
