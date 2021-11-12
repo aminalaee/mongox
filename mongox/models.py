@@ -50,11 +50,11 @@ class Query:
 class QuerySet(typing.Generic[T]):
     def __init__(
         self,
-        cls: typing.Type[T],
+        cls_model: typing.Type[T],
         kwargs: typing.Dict[str, typing.Any] = None,
     ) -> None:
-        self._cls = cls
-        self._collection = cls.Meta.collection._collection
+        self._cls_model = cls_model
+        self._collection = cls_model.Meta.collection._collection
         self._filter: typing.Dict[str, typing.Any] = kwargs or {}
         self._limit_count = 0
         self._skip_count = 0
@@ -76,7 +76,7 @@ class QuerySet(typing.Generic[T]):
         if self._limit_count:
             cursor = cursor.limit(self._limit_count)
 
-        return [self._cls(**document) async for document in cursor]
+        return [self._cls_model(**document) async for document in cursor]
 
     async def count(self) -> int:
         """
@@ -269,13 +269,13 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
 
         kwargs: typing.Dict = {}
         if not args:
-            return QuerySet(cls=cls, kwargs=kwargs)
+            return QuerySet(cls_model=cls, kwargs=kwargs)
 
         for arg in args:
             assert isinstance(arg, dict), "Invalid argument to Query"
             kwargs.update(Query._map(arg))
 
-        return QuerySet(cls=cls, kwargs=kwargs)
+        return QuerySet(cls_model=cls, kwargs=kwargs)
 
     async def save(self: T) -> T:
         """
