@@ -2,7 +2,7 @@ import typing
 
 import bson
 from pydantic import Field
-from pydantic.fields import ModelField
+from pydantic.fields import ModelField as PydanticModelField
 
 __all__ = ["Field", "ObjectId"]
 
@@ -27,7 +27,7 @@ class ObjectId(bson.ObjectId):
         field_schema.update(type="string")
 
 
-class ModelField(ModelField):
+class ModelField(PydanticModelField):
     """
     Custom ModelField to create query building
     """

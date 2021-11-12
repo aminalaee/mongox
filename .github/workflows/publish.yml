@@ -1,0 +1,29 @@
+---
+name: Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    name: "Publish release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: 3.9
+      - name: "Install Poetry"
+        run: "python -m pip install poetry"
+      - name: "Install dependencies"
+        run: "python -m poetry install"
+      - name: "Build package & docs"
+        run: "python -m poetry run bash scripts/build"
+      - name: "Publish to PyPI & deploy docs"
+        run: "python -m poetry run bash scripts/publish"
+        env:
+          PYPI_USERNAME: __token__
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}

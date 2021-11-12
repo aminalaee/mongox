@@ -5,7 +5,7 @@
     <img src="https://github.com/aminalaee/mongox/workflows/Test%20Suite/badge.svg" alt="Build Status">
 </a>
 <a href="https://github.com/aminalaee/mongox/actions">
-    <img src="https://github.com/aminalaee/mongox/workflows/publish/badge.svg" alt="Publish Status">
+    <img src="https://github.com/aminalaee/mongox/workflows/Publish/badge.svg" alt="Publish Status">
 </a>
 <a href="https://codecov.io/gh/aminalaee/mongox">
     <img src="https://codecov.io/gh/aminalaee/mongox/branch/main/graph/badge.svg" alt="Coverage">
@@ -21,7 +21,7 @@ which is built on top [Motor][motor] and [Pydantic][pydantic].
 The main features include:
 
 * Fully type annotated
-* Async support Python 3.6+ (since it's built on top of Motor)
+* Async support Python 3.7+ (since it's built on top of Motor)
 * Elegant editor support (since it's built on top of Pydantic)
 * Autocompletion everywhere, from object creation to query results
 * Custom query builder which is more intuitive and pythonic
