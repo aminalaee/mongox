@@ -3,6 +3,10 @@ site_description: Python MongoDB Object-Document-Mapper based on Motor and Pydan
 
 theme:
     name: 'material'
+    palette:
+      primary: white
+    logo: assets/images/icon.png
+    favicon: assets/images/icon.png
 
 repo_name: aminalaee/mongox
 repo_url: https://github.com/aminalaee/mongox

@@ -54,7 +54,9 @@ import asyncio
 
 import mongox
 
-client = Client(database_uri, get_event_loop=asyncio.get_running_loop)
+client = mongox.Client(
+    "mongodb://localhost:27017", get_event_loop=asyncio.get_running_loop
+)
 db = client.get_database("test_db")
 
 
@@ -72,25 +74,27 @@ Now you can create some instances and insert them into the database:
 movie = await Movie(name="Forrest Gump", year=1994).insert()
 ```
 
-The returned result will be a `Movie` instance, and also
-`mypy` will understand that the `insert` will return a `Movie` instance.
-So you will have type hints everywhere:
+The returned result will be a `Movie` instance, and `mypy`
+will understand that this is a `Movie` instance.
+So you will have type hints and validations everywhere:
 
-IMAGE HERE
+<img alt="MongoX insert screenshot" src="https://user-images.githubusercontent.com/19784933/141309006-94785d1b-c0de-4fde-8b7d-f59253657d64.png">
 
 Now you can fetch some data from the database.
 
-You can use the same pattern as Pymongo/Motor:
+You can use the same pattern as PyMongo/Motor:
 
 ```python
 movie = await Movie.query({"name": "Forrest Gump"}).get()
 ```
 
-Here the result returned will be a `Movie` instance and also
-`mypy` will understand that the `get` method will return a `Movie`.
+The returned result will be a `Movie` instance, and `mypy`
+will understand that this is a `Movie` instance.
+
 This will have great IDE support, autocompletion and validation.
 
-IMAGE HERE
+<img alt="MongoX get screenshot" src="https://user-images.githubusercontent.com/19784933/141309375-02dea9aa-3da3-40fc-9d8f-f50973aa674a.png">
+
 
 Or you can use `Movie` fields instead of dictionaries in the query (less room for bugs):
 
@@ -98,7 +102,7 @@ Or you can use `Movie` fields instead of dictionaries in the query (less room fo
 movie = await Movie.query({Movie.name: "Forrest Gump"}).get()
 ```
 
-And finally you can use a more intuitive query:
+And finally you can use a more intuitive query (limited yet):
 
 ```python
 movie = await Movie.query(Movie.name == "Forrest Gump").get()
@@ -106,7 +110,11 @@ movie = await Movie.query(Movie.name == "Forrest Gump").get()
 
 Notice how we omitted the dictionary and passed the `Movie` fields in comparison.
 
-Please refer to the documentation for full features.
+---
+
+Please refer to the documentation [here](https://aminalaee.github.io/mongox) or the full examples [here](https://github.com/aminalaee/mongox/tree/main/examples).
+
+---
 
 [motor]: https://github.com/mongodb/motor
 [pydantic]: https://github.com/samuelcolvin/pydantic
