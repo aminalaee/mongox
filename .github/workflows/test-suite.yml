@@ -44,4 +44,4 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           verbose: true
-          files: .coverage
+          files: coverage.xml

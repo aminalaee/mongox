@@ -23,3 +23,8 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.tabbed
   - pymdownx.superfences
+
+extra:
+  analytics:
+    provider: google
+    property: G-7Z9QW7E0WL
