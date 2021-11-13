@@ -1,4 +1,8 @@
-<a href="https://github.com/aminalaee/mongox"><img width="420px" src="https://raw.githubusercontent.com/aminalaee/mongox/add-coverage-and-update-logo/docs/assets/images/banner.png" alt"MongoX">
+<p align="center">
+<a href="https://github.com/aminalaee/mongox">
+    <img width="420px" src="https://raw.githubusercontent.com/aminalaee/mongox/add-coverage-and-update-logo/docs/assets/images/banner.png" alt"MongoX">
+</a>
+</p>
 
 <p>
 <a href="https://github.com/aminalaee/mongox/actions">
