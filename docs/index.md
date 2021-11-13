@@ -1,7 +1,4 @@
-<h1 align="center">
-  <a href="https://github.com/aminalaee/mongox"><img style="vertical-align:middle;" width="64px" src="https://raw.githubusercontent.com/aminalaee/mongox/main/docs/assets/images/icon.png" alt="Mongox"></a>
-  MongoX
-</h1>
+<a href="https://github.com/aminalaee/mongox"><img width="420px" src="https://raw.githubusercontent.com/aminalaee/mongox/add-coverage-and-update-logo/docs/assets/images/banner.png" alt"MongoX">
 
 <p>
 <a href="https://github.com/aminalaee/mongox/actions">
@@ -17,6 +14,10 @@
     <img src="https://badge.fury.io/py/mongox.svg" alt="Package version">
 </a>
 </p>
+
+---
+
+# MongoX
 
 MongoX is an async python ODM (Object Document Mapper) for MongoDB
 which is built on top [Motor][motor] and [Pydantic][pydantic].
