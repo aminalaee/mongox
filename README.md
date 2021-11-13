@@ -1,6 +1,10 @@
-# MongoX
+<p align="center">
+<a href="https://github.com/aminalaee/mongox">
+    <img width="420px" src="https://raw.githubusercontent.com/aminalaee/mongox/main/docs/assets/images/banner.png" alt"MongoX">
+</a>
+</p>
 
-<p>
+<p align="center">
 <a href="https://github.com/aminalaee/mongox/actions">
     <img src="https://github.com/aminalaee/mongox/workflows/Test%20Suite/badge.svg" alt="Build Status">
 </a>
@@ -14,6 +18,10 @@
     <img src="https://badge.fury.io/py/mongox.svg" alt="Package version">
 </a>
 </p>
+
+---
+
+# MongoX
 
 MongoX is an async python ODM (Object Document Mapper) for MongoDB
 which is built on top [Motor][motor] and [Pydantic][pydantic].
@@ -93,7 +101,7 @@ will understand that this is a `Movie` instance.
 
 This will have great IDE support, autocompletion and validation.
 
-<img alt="MongoX get screenshot" src="https://user-images.githubusercontent.com/19784933/141309375-02dea9aa-3da3-40fc-9d8f-f50973aa674a.png">
+<img alt="MongoX get screenshot" src="https://user-images.githubusercontent.com/19784933/141615279-f4534246-e09d-4d5e-90f6-32f0a3807769.png">
 
 
 Or you can use `Movie` fields instead of dictionaries in the query (less room for bugs):

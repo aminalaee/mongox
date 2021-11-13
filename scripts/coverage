@@ -3,3 +3,5 @@
 set -x
 
 poetry run coverage report --show-missing --skip-covered --fail-under=100
+poetry run coverage xml
+poetry run coverage html
