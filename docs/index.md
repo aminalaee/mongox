@@ -4,7 +4,7 @@
 </a>
 </p>
 
-<p>
+<p align="center">
 <a href="https://github.com/aminalaee/mongox/actions">
     <img src="https://github.com/aminalaee/mongox/workflows/Test%20Suite/badge.svg" alt="Build Status">
 </a>
