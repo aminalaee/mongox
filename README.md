@@ -1,4 +1,4 @@
-<h1 align="center">
+<h1 align="center" style="vertical-align:middle;">
   <a href="https://github.com/aminalaee/mongox"><img style="vertical-align:middle;" width="64px" src="https://raw.githubusercontent.com/aminalaee/mongox/main/docs/assets/images/icon.png" alt="Mongox"></a>
   MongoX
 </h1>
