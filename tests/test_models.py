@@ -290,6 +290,11 @@ async def test_raw_queries() -> None:
     assert movie.name == "Gone with the wind"
     assert movie.year == 1939
 
+    movie = await Movie.query({"year": 1942}).query({"name": {"$regex": "Casa"}}).get()
+
+    assert movie.name == "Casablanca"
+    assert movie.year == 1942
+
     movie = (
         await Movie.query({"name": "Casablanca"}).query({"year": {"$lt": 1950}}).get()
     )

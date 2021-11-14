@@ -119,7 +119,7 @@ movies = (
 )
 ```
 
-Or as a shortcut, you can use the `Query` class:
+Or as a shortcut, you can use the `mongox.Query` class:
 
 ```python
 movies = await Movie.query().sort(Query.asc(Movie.name)).all()
@@ -127,7 +127,7 @@ movies = await Movie.query().sort(Query.asc(Movie.name)).all()
 
 Or chaining multiple sorts again:
 
-```
+```python
 movies = (
     await Movie.query()
     .sort(Query.desc(Movie.name))
