@@ -11,7 +11,7 @@ from mongox.database import Client
 from mongox.exceptions import MultipleMatchesFound, NoMatchFound
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order
-from mongox.models import Model
+from mongox.models import Model, Query
 
 pytestmark = pytest.mark.asyncio
 
@@ -143,6 +143,38 @@ async def test_model_sort() -> None:
     assert movies[0].name == "Forrest Gump"
     assert movies[1].name == "Batman"
 
+    movies = (
+        await Movie.query()
+        .sort([(Movie.name, Order.DESCENDING), (Movie.year, Order.DESCENDING)])
+        .all()
+    )
+
+    assert movies[0].name == "Forrest Gump"
+    assert movies[1].name == "Batman"
+
+    movies = (
+        await Movie.query()
+        .sort(Movie.name, Order.DESCENDING)
+        .sort(Movie.year, Order.ASCENDING)
+        .all()
+    )
+
+    assert movies[0].name == "Forrest Gump"
+    assert movies[1].name == "Batman"
+
+    movies = await Movie.query().sort(Query.asc(Movie.name)).all()
+    assert movies[0].name == "Batman"
+    assert movies[1].name == "Forrest Gump"
+
+    movies = (
+        await Movie.query()
+        .sort(Query.desc(Movie.name))
+        .sort(Query.asc(Movie.year))
+        .all()
+    )
+    assert movies[0].name == "Forrest Gump"
+    assert movies[1].name == "Batman"
+
 
 async def test_model_skip() -> None:
     movies = await Movie.query().sort(Movie.name, Order.ASCENDING).skip(1).all()
@@ -245,3 +277,22 @@ async def test_model_query_builder() -> None:
         await Movie.query(Movie.name == "Casablanca").query(Movie.year == 1942).get()
         == await Movie.query(Movie.name == "Casablanca", Movie.year == 1942).get()
     )
+
+
+async def test_raw_queries() -> None:
+    movie = await Movie.query({"name": "Casablanca"}).get()
+
+    assert movie.name == "Casablanca"
+    assert movie.year == 1942
+
+    movie = await Movie.query({"year": {"$lt": 1940}}).get()
+
+    assert movie.name == "Gone with the wind"
+    assert movie.year == 1939
+
+    movie = (
+        await Movie.query({"name": "Casablanca"}).query({"year": {"$lt": 1950}}).get()
+    )
+
+    assert movie.name == "Casablanca"
+    assert movie.year == 1942

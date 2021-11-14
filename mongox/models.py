@@ -5,70 +5,49 @@ import pydantic
 
 from mongox.database import Collection
 from mongox.exceptions import MultipleMatchesFound, NoMatchFound
+from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
 from mongox.index import Index, Order
 
 T = typing.TypeVar("T", bound="Model")
 
-__all__ = ["Model"]
+__all__ = ["Model", "Query"]
 
 
 class Query:
     @classmethod
-    def _map_model_field(cls, field: typing.Union[str, ModelField]) -> str:
-        if isinstance(field, ModelField):
-            return field.alias
-        return field
-
-    @typing.overload
-    @classmethod
-    def _map(
-        cls,
-        kwargs: typing.Dict[str, typing.Any],
-    ) -> typing.Dict[str, typing.Any]:  # pragma: no cover
-        ...
-
-    @typing.overload
-    @classmethod
-    def _map(
-        cls,
-        kwargs: typing.Dict[ModelField, typing.Any],
-    ) -> typing.Dict[str, typing.Any]:  # pragma: no cover
-        ...
+    def asc(cls, key: typing.Any) -> SortExpression:
+        return SortExpression(key, Order.ASCENDING)
 
     @classmethod
-    def _map(
-        cls,
-        kwargs: typing.Dict,
-    ) -> typing.Dict[str, typing.Any]:
-        query: typing.Dict[str, typing.Any] = {}
-        for key, value in kwargs.items():
-            query[cls._map_model_field(key)] = value
-        return query
+    def desc(cls, key: typing.Any) -> SortExpression:
+        return SortExpression(key, Order.DESCENDING)
 
 
 class QuerySet(typing.Generic[T]):
     def __init__(
         self,
         cls_model: typing.Type[T],
-        kwargs: typing.Dict[str, typing.Any] = None,
+        filter_: typing.List[QueryExpression] = None,
     ) -> None:
         self._cls_model = cls_model
         self._collection = cls_model.Meta.collection._collection
-        self._filter: typing.Dict[str, typing.Any] = kwargs or {}
+        self._filter: typing.List[QueryExpression] = filter_ or []
         self._limit_count = 0
         self._skip_count = 0
-        self._sort: list = []
+        self._sort: typing.List[SortExpression] = []
 
     async def all(self) -> typing.List[T]:
         """
         Fetch all documents matching the criteria
         """
 
-        cursor = self._collection.find(self._filter)
+        filter_query = QueryExpression.compile_many(self._filter)
+        cursor = self._collection.find(filter_query)
 
         if self._sort:
-            cursor = cursor.sort(self._sort)
+            sort_query = [expr.compile() for expr in self._sort]
+            cursor = cursor.sort(sort_query)
 
         if self._skip_count:
             cursor = cursor.skip(self._skip_count)
@@ -83,14 +62,16 @@ class QuerySet(typing.Generic[T]):
         Get count of documents matching the criteria
         """
 
-        return await self._collection.count_documents(self._filter)
+        filter_query = QueryExpression.compile_many(self._filter)
+        return await self._collection.count_documents(filter_query)
 
     async def delete(self) -> int:
         """
         Delete documents matching the criteria
         """
 
-        result = await self._collection.delete_many(self._filter)
+        filter_query = QueryExpression.compile_many(self._filter)
+        result = await self._collection.delete_many(filter_query)
         return result.deleted_count
 
     async def first(self) -> typing.Optional[T]:
@@ -129,8 +110,12 @@ class QuerySet(typing.Generic[T]):
         """
 
         for arg in args:
-            assert isinstance(arg, dict), "Invalid argument to Query"
-            self._filter.update(Query._map(arg))
+            assert isinstance(arg, (dict, QueryExpression)), "Invalid argument to Query"
+            if isinstance(arg, dict):
+                query_expression = QueryExpression.unpack(arg)
+                self._filter.append(query_expression)
+            else:
+                self._filter.append(arg)
 
         return self
 
@@ -143,24 +128,18 @@ class QuerySet(typing.Generic[T]):
         return self
 
     @typing.overload
-    def sort(self, key: str, direction: Order) -> "QuerySet[T]":  # pragma: no cover
+    def sort(self, key: SortExpression) -> "QuerySet[T]":  # pragma: no cover
         ...
 
     @typing.overload
     def sort(
-        self, key: ModelField, direction: Order
+        self, key: typing.Any, direction: Order
     ) -> "QuerySet[T]":  # pragma: no cover
         ...
 
     @typing.overload
     def sort(
-        self, key: typing.List[typing.Tuple[str, Order]]
-    ) -> "QuerySet[T]":  # pragma: no cover
-        ...
-
-    @typing.overload
-    def sort(
-        self, key: typing.List[typing.Tuple[ModelField, Order]]
+        self, key: typing.List[typing.Tuple[typing.Any, Order]]
     ) -> "QuerySet[T]":  # pragma: no cover
         ...
 
@@ -171,17 +150,18 @@ class QuerySet(typing.Generic[T]):
         Sort by (key, direction) or [(key, direction)]
         """
 
-        criteria = []
         direction = direction or Order.ASCENDING
 
         if isinstance(key, list):
             for key_dir in key:
-                k, d = key_dir
-                criteria.append((Query._map_model_field(k), d))
+                sort_expression = SortExpression(*key_dir)
+                self._sort.append(sort_expression)
+        elif isinstance(key, (str, ModelField)):
+            sort_expression = SortExpression(key, direction)
+            self._sort.append(sort_expression)
         else:
-            criteria = [(Query._map_model_field(key), direction)]
+            self._sort.append(key)
 
-        self._sort.append(*criteria)
         return self
 
     async def update(self, *args: typing.Dict) -> typing.List[T]:
@@ -190,12 +170,21 @@ class QuerySet(typing.Generic[T]):
         """
 
         kwargs = {}
+        filter_: typing.List[QueryExpression] = []
+
         for arg in args:
-            kwargs.update(Query._map(arg))
+            for key, value in arg.items():
+                if isinstance(key, ModelField):
+                    key = key.name
+                kwargs[key] = value
 
-        await self._collection.update_many(self._filter, {"$set": kwargs})
+            query_expression = QueryExpression(key, "$eq", value)
+            filter_.append(query_expression)
 
-        self._filter = kwargs
+        filter_query = QueryExpression.compile_many(self._filter)
+        await self._collection.update_many(filter_query, {"$set": kwargs})
+
+        self._filter = filter_
 
         return await self.all()
 
@@ -267,15 +256,19 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         Filter query criteria
         """
 
-        kwargs: typing.Dict = {}
+        filter_: typing.List[QueryExpression] = []
         if not args:
-            return QuerySet(cls_model=cls, kwargs=kwargs)
+            return QuerySet(cls_model=cls)
 
         for arg in args:
-            assert isinstance(arg, dict), "Invalid argument to Query"
-            kwargs.update(Query._map(arg))
+            assert isinstance(arg, (dict, QueryExpression)), "Invalid argument to Query"
+            if isinstance(arg, dict):
+                query_expression = QueryExpression.unpack(arg)
+                filter_.append(query_expression)
+            else:
+                filter_.append(arg)
 
-        return QuerySet(cls_model=cls, kwargs=kwargs)
+        return QuerySet(cls_model=cls, filter_=filter_)
 
     async def save(self: T) -> T:
         """

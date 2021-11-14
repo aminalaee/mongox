@@ -4,6 +4,8 @@ import bson
 from pydantic import Field
 from pydantic.fields import ModelField as PydanticModelField
 
+from mongox.expressions import QueryExpression
+
 __all__ = ["Field", "ObjectId"]
 
 
@@ -34,36 +36,24 @@ class ModelField(PydanticModelField):
 
     __slots__: typing.Tuple[str, ...] = tuple()
 
-    def __lt__(
-        self, other: typing.Any
-    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        return {self.name: {"$lt": other}}
+    def __lt__(self, other: typing.Any) -> QueryExpression:
+        return QueryExpression(self.name, "$lt", other)
 
-    def __le__(
-        self, other: typing.Any
-    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        return {self.name: {"$lte": other}}
+    def __le__(self, other: typing.Any) -> QueryExpression:
+        return QueryExpression(self.name, "$lte", other)
 
-    def __eq__(  # type: ignore[override]
-        self, other: typing.Any
-    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
+    def __eq__(self, other: typing.Any) -> QueryExpression:  # type: ignore[override]
         # Using $eq instead of simple dict to allow regex
-        return {self.name: {"$eq": other}}
+        return QueryExpression(self.name, "$eq", other)
 
-    def __ne__(  # type: ignore[override]
-        self, other: typing.Any
-    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        return {self.name: {"$ne": other}}
+    def __ne__(self, other: typing.Any) -> QueryExpression:  # type: ignore[override]
+        return QueryExpression(self.name, "$ne", other)
 
-    def __gt__(
-        self, other: typing.Any
-    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        return {self.name: {"$gt": other}}
+    def __gt__(self, other: typing.Any) -> QueryExpression:
+        return QueryExpression(self.name, "$gt", other)
 
-    def __ge__(
-        self, other: typing.Any
-    ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        return {self.name: {"$gte": other}}
+    def __ge__(self, other: typing.Any) -> QueryExpression:
+        return QueryExpression(self.name, "$gte", other)
 
     def __hash__(self) -> int:
         return super().__hash__()

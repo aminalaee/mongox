@@ -102,13 +102,39 @@ It's up to the caller to set the appropriate limits.
 count = await Movie.query({Movie.year: 1994}).count()
 ```
 
-* `sort` to sort documents the same way Motor/PyMongo allows:
+* `sort` to sort documents based on keys:
 
 ```python
-movies = await Movie.query().sort([(Movie.name, mongox.Order.DESCENDING)]).all()
+movies = await Movie.query().sort(Movie.name, mongox.Order.DESCENDING).all()
 ```
 
-You can use `Order` from `mongox` to have `ASCENDING` or `DESCENDING` order.
+You can also chain multiple `sort` methods:
+
+```python
+movies = (
+    await Movie.query()
+    .sort(Movie.name, Order.DESCENDING)
+    .sort(Movie.year, Order.ASCENDING)
+    .all()
+)
+```
+
+Or as a shortcut, you can use the `Query` class:
+
+```python
+movies = await Movie.query().sort(Query.asc(Movie.name)).all()
+```
+
+Or chaining multiple sorts again:
+
+```
+movies = (
+    await Movie.query()
+    .sort(Query.desc(Movie.name))
+    .sort(Query.asc(Movie.year))
+    .all()
+)
+```
 
 * `limit` to limit number of documents returned:
 
