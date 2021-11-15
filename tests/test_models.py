@@ -219,7 +219,7 @@ async def test_model_update_save() -> None:
     movie = await Movie.query().get()
     assert movie.year == 2003
 
-    movie.year = movie.year + 1
+    movie.year += 1
     await movie.save()
 
     movie = await Movie.query().get()

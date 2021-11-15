@@ -33,10 +33,7 @@ class Index(pymongo.IndexModel):
         sparse: bool = False,
         **kwargs: typing.Any,
     ) -> None:
-        keys = keys or []
-        if key:
-            keys = [(key, Order.ASCENDING)]
-
+        keys = [(key, Order.ASCENDING)] if key else keys or []
         self.name = name or "_".join([key[0] for key in keys])
 
         kwargs["name"] = self.name
