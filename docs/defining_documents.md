@@ -32,13 +32,12 @@ Now we have a `Movie` collection with attributes `name` and `year`.
 !!! note
     The `Meta` class is required since we need to know which collection this belongs to.
 
-
 ### Field validation
 
 You can add field-level validations by using `mongox.Field`.
 This is actually just a short-cut to the Pydantic `Field` and accepts the same arguments.
 
-Let's say we want to limit the `year` attribute to be more strict:
+Let's say we want to limit the `year` attribute of Movie to be more strict:
 
 ```python
 import mongox
@@ -49,7 +48,7 @@ class Movie(mongox.Model):
     year: int = mongox.Field(gt=1800)
 ```
 
-Now you when creating a `Movie` instance, the year will be validated:
+Now when creating a `Movie` instance, the year will be validated differently.
 
 This will be ok:
 
@@ -67,6 +66,8 @@ await Movie(name="Golden Oldie", year=1790).insert()
 # E     ensure this value is greater than 1800 (type=value_error.number.not_gt; limit_value=1800)
 ```
 
+Some of the most common `Field` arguments include:
+
 For numeric types like `int`, `float` and `Decimal`:
 
 * `gt` Rquires the field to be greater than
@@ -81,5 +82,5 @@ For strings:
 * `max_length` Requires the field to have a maximum length
 * `regex` Requires the field to match a regular expression
 
-For a full list of `Field` customizations you can refer to
+For a full list of `Field` arguments you can refer to
 the Pydantic docs [here](https://pydantic-docs.helpmanual.io/usage/schema/#field-customisation).
