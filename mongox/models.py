@@ -226,6 +226,9 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
 
     id: typing.Optional[ObjectId] = pydantic.Field(alias="_id")
 
+    class Config:
+        validate_assignment = True
+
     async def insert(self: T) -> T:
         """
         Insert the document
