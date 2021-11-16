@@ -36,10 +36,14 @@ class QueryExpression:
 
         for expr in expressions:
             for key, value in expr.compile().items():
+                # Logical operators need a {"$or": [...]} query
                 if key in ["$and", "$or"]:
-                    list_value = value[key]
+                    list_value = value.get(key, value.get("$eq"))
                     assert isinstance(list_value, (list, tuple))
-                    values = [v.compile() for v in list_value]
+                    values = [
+                        v.compile() if isinstance(v, QueryExpression) else v
+                        for v in list_value
+                    ]
                     compiled_lists[key] = values
                 else:
                     compiled_dicts[key].update(value)

@@ -313,6 +313,19 @@ async def test_raw_queries() -> None:
     assert movie.name == "Casablanca"
     assert movie.year == 1942
 
+    movie = await Movie.query({"$and": [{"name": "Casablanca", "year": 1942}]}).get()
+
+    assert movie.name == "Casablanca"
+    assert movie.year == 1942
+
+    movies = await Movie.query(
+        {"$or": [{"name": "The Two Towers"}, {"year": {"$gt": 2005}}]}
+    ).all()
+
+    assert movies[0].name == "The Two Towers"
+    assert movies[1].name == "Downfall"
+    assert movies[2].name == "Boyhood"
+
 
 async def test_custom_query_operators() -> None:
     movies = await Movie.query(Q.in_(Movie.year, [2000, 2001, 2002])).all()
