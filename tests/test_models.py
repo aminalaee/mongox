@@ -273,6 +273,10 @@ async def test_model_query_builder() -> None:
     assert movie.name == "Casablanca"
     assert movie.year == 1942
 
+    movie = await Movie.query(Movie.year > 2000).query(Movie.year < 2003).get()
+    assert movie.name == "The Two Towers"
+    assert movie.year == 2002
+
     assert (
         await Movie.query(Movie.name == "Casablanca").query(Movie.year == 1942).get()
         == await Movie.query(Movie.name == "Casablanca", Movie.year == 1942).get()
@@ -290,6 +294,18 @@ async def test_raw_queries() -> None:
     assert movie.name == "Gone with the wind"
     assert movie.year == 1939
 
+    movie = await Movie.query({"year": {"$lt": 2003, "$gt": 2000}}).get()
+
+    assert movie.name == "The Two Towers"
+    assert movie.year == 2002
+
+    movie = (
+        await Movie.query({"year": {"$gt": 2000}}).query({"year": {"$lt": 2003}}).get()
+    )
+
+    assert movie.name == "The Two Towers"
+    assert movie.year == 2002
+
     movie = await Movie.query({"year": 1942}).query({"name": {"$regex": "Casa"}}).get()
 
     assert movie.name == "Casablanca"
@@ -301,3 +317,21 @@ async def test_raw_queries() -> None:
 
     assert movie.name == "Casablanca"
     assert movie.year == 1942
+
+
+async def test_custom_query_operators() -> None:
+    movies = await Movie.query(Query.in_(Movie.year, [2000, 2001, 2002])).all()
+
+    assert len(movies) == 1
+    assert movies[0].name == "The Two Towers"
+
+    movies = (
+        await Movie.query(Movie.year > 2000)
+        .query(Movie.year <= 2010)
+        .query(Query.not_in(Movie.year, [2001, 2002]))
+        .all()
+    )
+
+    assert len(movies) == 2
+    assert movies[0].name == "Downfall"
+    assert movies[1].name == "Boyhood"

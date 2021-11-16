@@ -1,3 +1,4 @@
+import collections
 import typing
 
 from mongox.index import Order
@@ -7,6 +8,10 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 class QueryExpression:
+    """
+    Dataclass holding Query crtieria
+    """
+
     def __init__(
         self, key: typing.Union[str, "ModelField"], operator: str, value: typing.Any
     ) -> None:
@@ -26,33 +31,45 @@ class QueryExpression:
     def compile_many(
         cls, expressions: typing.List["QueryExpression"]
     ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        compiled_expressions = {}
+        # Using defaultdict to allow {key: {}} for queries
+        compiled_expressions: typing.Dict[typing.Any, dict] = collections.defaultdict(
+            dict
+        )
         for expr in expressions:
-            compiled_expressions.update(expr.compile())
+            for key, value in expr.compile().items():
+                compiled_expressions[key].update(value)
         return compiled_expressions
 
     @classmethod
-    def unpack(self, d: typing.Dict[str, typing.Any]) -> "QueryExpression":
+    def unpack(self, d: typing.Dict[str, typing.Any]) -> "typing.List[QueryExpression]":
         """
-        Unpack dictionary to QueryExpression.
+        Unpack dictionary to a list of QueryExpression.
 
         For now works only for the following queries:
             d = {"name": "value"}
             d = {"year": {"$gt": 1990}}
+            d = {"year": {"$gt": 1990, "$lt": 2000}}
         """
 
-        key = list(d.keys())[0]
-        value = list(d.values())[0]
+        expressions: typing.List[QueryExpression] = []
 
-        if isinstance(value, dict):
-            operator = list(value.keys())[0]
-            v = list(value.values())[0]
-            return QueryExpression(key, operator, v)
-        else:
-            return QueryExpression(key, "$eq", value)
+        for key, value in d.items():
+            if isinstance(value, dict):
+                for op, v in value.items():
+                    expr = QueryExpression(key=key, operator=op, value=v)
+                    expressions.append(expr)
+            else:
+                expr = QueryExpression(key=key, operator="$eq", value=value)
+                expressions.append(expr)
+
+        return expressions
 
 
 class SortExpression:
+    """
+    Dataclass holding Sort criteria
+    """
+
     def __init__(self, key: typing.Union[str, "ModelField"], direction: Order) -> None:
         if not isinstance(key, str):
             key = key.alias
