@@ -11,10 +11,10 @@ from mongox.index import Index, Order
 
 T = typing.TypeVar("T", bound="Model")
 
-__all__ = ["Model", "Query"]
+__all__ = ["Model", "Q"]
 
 
-class Query:
+class Q:
     @classmethod
     def asc(cls, key: typing.Any) -> SortExpression:
         return SortExpression(key, Order.ASCENDING)
@@ -22,6 +22,24 @@ class Query:
     @classmethod
     def desc(cls, key: typing.Any) -> SortExpression:
         return SortExpression(key, Order.DESCENDING)
+
+    @classmethod
+    def in_(cls, key: typing.Any, values: typing.List) -> QueryExpression:
+        return QueryExpression(key=key, operator="$in", value=values)
+
+    @classmethod
+    def not_in(cls, key: typing.Any, values: typing.List) -> QueryExpression:
+        return QueryExpression(key=key, operator="$nin", value=values)
+
+    @classmethod
+    def and_(cls, *args: typing.Union[bool, QueryExpression]) -> QueryExpression:
+        assert not isinstance(args, bool)
+        return QueryExpression(key="$and", operator="$and", value=args)
+
+    @classmethod
+    def or_(cls, *args: typing.Union[bool, QueryExpression]) -> QueryExpression:
+        assert not isinstance(args, bool)
+        return QueryExpression(key="$or", operator="$or", value=args)
 
 
 class QuerySet(typing.Generic[T]):
@@ -104,7 +122,9 @@ class QuerySet(typing.Generic[T]):
         self._limit_count = count
         return self
 
-    def query(self, *args: typing.Union[bool, typing.Dict]) -> "QuerySet[T]":
+    def query(
+        self, *args: typing.Union[bool, typing.Dict, QueryExpression]
+    ) -> "QuerySet[T]":
         """
         Filter query criteria
         """
@@ -112,8 +132,8 @@ class QuerySet(typing.Generic[T]):
         for arg in args:
             assert isinstance(arg, (dict, QueryExpression)), "Invalid argument to Query"
             if isinstance(arg, dict):
-                query_expression = QueryExpression.unpack(arg)
-                self._filter.append(query_expression)
+                query_expressions = QueryExpression.unpack(arg)
+                self._filter.extend(query_expressions)
             else:
                 self._filter.append(arg)
 
@@ -253,7 +273,7 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
 
     @classmethod
     def query(
-        cls: typing.Type[T], *args: typing.Union[bool, typing.Dict]
+        cls: typing.Type[T], *args: typing.Union[bool, typing.Dict, QueryExpression]
     ) -> QuerySet[T]:
         """
         Filter query criteria
@@ -266,8 +286,8 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         for arg in args:
             assert isinstance(arg, (dict, QueryExpression)), "Invalid argument to Query"
             if isinstance(arg, dict):
-                query_expression = QueryExpression.unpack(arg)
-                filter_.append(query_expression)
+                query_expressions = QueryExpression.unpack(arg)
+                filter_.extend(query_expressions)
             else:
                 filter_.append(arg)
 

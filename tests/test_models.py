@@ -11,7 +11,7 @@ from mongox.database import Client
 from mongox.exceptions import MultipleMatchesFound, NoMatchFound
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order
-from mongox.models import Model, Query
+from mongox.models import Model, Q
 
 pytestmark = pytest.mark.asyncio
 
@@ -162,16 +162,11 @@ async def test_model_sort() -> None:
     assert movies[0].name == "Forrest Gump"
     assert movies[1].name == "Batman"
 
-    movies = await Movie.query().sort(Query.asc(Movie.name)).all()
+    movies = await Movie.query().sort(Q.asc(Movie.name)).all()
     assert movies[0].name == "Batman"
     assert movies[1].name == "Forrest Gump"
 
-    movies = (
-        await Movie.query()
-        .sort(Query.desc(Movie.name))
-        .sort(Query.asc(Movie.year))
-        .all()
-    )
+    movies = await Movie.query().sort(Q.desc(Movie.name)).sort(Q.asc(Movie.year)).all()
     assert movies[0].name == "Forrest Gump"
     assert movies[1].name == "Batman"
 
@@ -273,6 +268,10 @@ async def test_model_query_builder() -> None:
     assert movie.name == "Casablanca"
     assert movie.year == 1942
 
+    movie = await Movie.query(Movie.year > 2000).query(Movie.year < 2003).get()
+    assert movie.name == "The Two Towers"
+    assert movie.year == 2002
+
     assert (
         await Movie.query(Movie.name == "Casablanca").query(Movie.year == 1942).get()
         == await Movie.query(Movie.name == "Casablanca", Movie.year == 1942).get()
@@ -290,6 +289,18 @@ async def test_raw_queries() -> None:
     assert movie.name == "Gone with the wind"
     assert movie.year == 1939
 
+    movie = await Movie.query({"year": {"$lt": 2003, "$gt": 2000}}).get()
+
+    assert movie.name == "The Two Towers"
+    assert movie.year == 2002
+
+    movie = (
+        await Movie.query({"year": {"$gt": 2000}}).query({"year": {"$lt": 2003}}).get()
+    )
+
+    assert movie.name == "The Two Towers"
+    assert movie.year == 2002
+
     movie = await Movie.query({"year": 1942}).query({"name": {"$regex": "Casa"}}).get()
 
     assert movie.name == "Casablanca"
@@ -301,3 +312,60 @@ async def test_raw_queries() -> None:
 
     assert movie.name == "Casablanca"
     assert movie.year == 1942
+
+    movie = await Movie.query({"$and": [{"name": "Casablanca", "year": 1942}]}).get()
+
+    assert movie.name == "Casablanca"
+    assert movie.year == 1942
+
+    movies = await Movie.query(
+        {"$or": [{"name": "The Two Towers"}, {"year": {"$gt": 2005}}]}
+    ).all()
+
+    assert movies[0].name == "The Two Towers"
+    assert movies[1].name == "Downfall"
+    assert movies[2].name == "Boyhood"
+
+
+async def test_custom_query_operators() -> None:
+    movies = await Movie.query(Q.in_(Movie.year, [2000, 2001, 2002])).all()
+
+    assert len(movies) == 1
+    assert movies[0].name == "The Two Towers"
+
+    movies = (
+        await Movie.query(Movie.year > 2000)
+        .query(Movie.year <= 2010)
+        .query(Q.not_in(Movie.year, [2001, 2002]))
+        .all()
+    )
+
+    assert len(movies) == 2
+    assert movies[0].name == "Downfall"
+    assert movies[1].name == "Boyhood"
+
+    movies = await Movie.query(
+        Q.or_(Movie.name == "The Two Towers", Movie.year > 2005)
+    ).all()
+    assert movies[0].name == "The Two Towers"
+    assert movies[1].name == "Downfall"
+    assert movies[2].name == "Boyhood"
+
+    movie = await Movie.query(
+        Q.and_(Movie.name == "The Two Towers", Movie.year > 2000)
+    ).get()
+    assert movie.name == "The Two Towers"
+
+    movie = (
+        await Movie.query(Q.and_(Movie.name == "The Two Towers", Movie.year > 2000))
+        .query(Movie.name == "The Two Towers")
+        .get()
+    )
+    assert movie.name == "The Two Towers"
+
+    count = (
+        await Movie.query(Q.and_(Movie.name == "The Two Towers", Movie.year > 2000))
+        .query(Movie.name == "Boyhood")
+        .count()
+    )
+    assert count == 0

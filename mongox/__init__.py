@@ -4,7 +4,7 @@ from mongox.database import Client, Collection, Database
 from mongox.exceptions import NoMatchFound
 from mongox.fields import Field, ObjectId
 from mongox.index import Index, IndexType, Order
-from mongox.models import Model, Query
+from mongox.models import Model, Q
 
 __all__ = [
     "Client",
@@ -17,5 +17,5 @@ __all__ = [
     "IndexType",
     "Order",
     "Model",
-    "Query",
+    "Q",
 ]
