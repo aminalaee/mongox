@@ -11,10 +11,10 @@ from mongox.index import Index, Order
 
 T = typing.TypeVar("T", bound="Model")
 
-__all__ = ["Model", "Query"]
+__all__ = ["Model", "Q"]
 
 
-class Query:
+class Q:
     @classmethod
     def asc(cls, key: typing.Any) -> SortExpression:
         return SortExpression(key, Order.ASCENDING)
@@ -30,6 +30,16 @@ class Query:
     @classmethod
     def not_in(cls, key: typing.Any, values: typing.List) -> QueryExpression:
         return QueryExpression(key=key, operator="$nin", value=values)
+
+    @classmethod
+    def and_(cls, *args: typing.Union[bool, QueryExpression]) -> QueryExpression:
+        assert not isinstance(args, bool)
+        return QueryExpression(key="$and", operator="$and", value=args)
+
+    @classmethod
+    def or_(cls, *args: typing.Union[bool, QueryExpression]) -> QueryExpression:
+        assert not isinstance(args, bool)
+        return QueryExpression(key="$or", operator="$or", value=args)
 
 
 class QuerySet(typing.Generic[T]):
@@ -51,7 +61,6 @@ class QuerySet(typing.Generic[T]):
         """
 
         filter_query = QueryExpression.compile_many(self._filter)
-        print(filter_query)
         cursor = self._collection.find(filter_query)
 
         if self._sort:

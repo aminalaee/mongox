@@ -119,10 +119,10 @@ movies = (
 )
 ```
 
-Or as a shortcut, you can use the `mongox.Query` class:
+Or as a shortcut, you can use the `mongox.Q` class:
 
 ```python
-movies = await Movie.query().sort(Query.asc(Movie.name)).all()
+movies = await Movie.query().sort(Q.asc(Movie.name)).all()
 ```
 
 Or chaining multiple sorts again:
@@ -130,8 +130,8 @@ Or chaining multiple sorts again:
 ```python
 movies = (
     await Movie.query()
-    .sort(Query.desc(Movie.name))
-    .sort(Query.asc(Movie.year))
+    .sort(Q.desc(Movie.name))
+    .sort(Q.asc(Movie.year))
     .all()
 )
 ```

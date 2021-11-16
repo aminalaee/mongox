@@ -31,14 +31,20 @@ class QueryExpression:
     def compile_many(
         cls, expressions: typing.List["QueryExpression"]
     ) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        # Using defaultdict to allow {key: {}} for queries
-        compiled_expressions: typing.Dict[typing.Any, dict] = collections.defaultdict(
-            dict
-        )
+        compiled_dicts: typing.Dict[typing.Any, dict] = collections.defaultdict(dict)
+        compiled_lists: typing.Dict[typing.Any, list] = collections.defaultdict(list)
+
         for expr in expressions:
             for key, value in expr.compile().items():
-                compiled_expressions[key].update(value)
-        return compiled_expressions
+                if key in ["$and", "$or"]:
+                    list_value = value[key]
+                    assert isinstance(list_value, (list, tuple))
+                    values = [v.compile() for v in list_value]
+                    compiled_lists[key] = values
+                else:
+                    compiled_dicts[key].update(value)
+
+        return {**compiled_dicts, **compiled_lists}
 
     @classmethod
     def unpack(self, d: typing.Dict[str, typing.Any]) -> "typing.List[QueryExpression]":
