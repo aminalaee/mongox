@@ -84,3 +84,92 @@ For strings:
 
 For a full list of `Field` arguments you can refer to
 the Pydantic docs [here](https://pydantic-docs.helpmanual.io/usage/schema/#field-customisation).
+
+### Defining indexes
+
+Index definition should be inside the `Meta` class of the Model.
+
+```python
+import mongox
+
+
+class Movie(mongox.Model):
+    name: str
+    genre: str
+    year: int
+
+    class Meta:
+        collection = db.get_collection("movies")
+        indexes = [
+            mongox.Index("name", unique=True),
+            mongox.Index(keys=[("year", mongox.Order.DESCENDING), ("genre", mongox.IndexType.HASHED)]),
+        ]
+```
+
+As you can see `Meta` class expects `indexes` to be a list of `Index` objects.
+
+For creating `Index` objects we have two options, for simple cases we can do:
+
+```python
+Index(key_name, **kwargs)
+```
+
+But to have more control over index definition we can do:
+
+```python
+Index(keys=[(key_name, index_order)], **kwargs)
+```
+
+And then, you can then create the collection indexes with:
+
+```python
+await Movie.create_indexes()
+```
+
+`Index` accepts the following arguments:
+
+* `key` For single key (simple indexes).
+
+* `keys` List of keys and their types.
+
+* `name` Can be specified or automatically generated from keys.
+
+* `background` If the index creation should happen in the background.
+
+* `unique` If the index should be a unique index.
+
+For example:
+
+```python
+Index(keys=[("year", Order.DESCENDING)], name="year_index", background=True)
+```
+
+To specify order of index you can use `mongox.Order`:
+
+```python
+from mongox import Order
+
+Index(keys=[("year", Order.ASCENDING)], name="year_index", background=True)
+```
+
+`Order` class has only two attributes `ASCENDING` and `DESCENDING`.
+
+And to specify custom index type, you can pass `mongox.IndexType` instead of index order:
+
+```python
+from mongox import IndexType
+
+Index(keys=[("year", IndexType.HASHED)], name="year_index", background=True)
+```
+
+`IndexType` has the supported PyMongo index types:
+
+* `GEO2D`
+
+* `GEOSPHERE`
+
+* `HASHED`
+
+* `TEXT`
+
+For a full list of allowed arguments you can refer to the PyMongo docs [here](https://pymongo.readthedocs.io/en/stable/api/pymongo/operations.html#pymongo.operations.IndexModel).

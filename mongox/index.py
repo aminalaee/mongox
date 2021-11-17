@@ -35,6 +35,7 @@ class Index(pymongo.IndexModel):
     ) -> None:
         keys = [(key, Order.ASCENDING)] if key else keys or []
         self.name = name or "_".join([key[0] for key in keys])
+        self.unique = unique
 
         kwargs["name"] = self.name
         kwargs["background"] = background

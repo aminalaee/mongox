@@ -16,10 +16,12 @@ nav:
     - Usage:
       - Defining documents: 'defining_documents.md'
       - Working with documents: 'queriying_documents.md'
+    - Cheat Sheet: 'cheat_sheet.md'
 
 markdown_extensions:
   - mkautodoc
   - admonition
+  - pymdownx.details
   - pymdownx.highlight
   - pymdownx.tabbed
   - pymdownx.superfences
