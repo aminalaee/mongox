@@ -243,3 +243,61 @@ number_of_deleted = await Movie.query({Movie.year: 1980}).delete()
 
 This will remove all documents having `year` equal to 1980,
 and the returned result is the number of documents deleted.
+
+### Q operator
+
+The `Q` class contains some handy methods for creating queries.
+
+In order to create sort queries you might usually do this:
+
+```python
+movies = await Movie.query().sort(Movie.name, Order.DESCENDING).all()
+```
+
+But as a short-cut you can use `Q`:
+
+* `Q.asc()` Creates ASCENDING sort.
+
+```python
+movies = await Movie.query().sort(Q.asc(Movie.name)).all()
+```
+
+* `Q.desc()` Creates DESCENDING sort.
+
+```python
+movies = await Movie.query().sort(Q.desc(Movie.name)).all()
+```
+
+There are also methods for creating more complex queries:
+
+* `Q.in_()` Querying with `$in` operator.
+
+```python
+movies = await Movie.query(Q.in_(Movie.year, [2000, 2001])).all()
+```
+
+* `Q.not_in()` Querying with `$nin` operator.
+
+```python
+movies = await Movie.query(Q.not_in(Movie.year, [2002, 2003])).all()
+```
+
+* `Q.and_()` Creating an `$and` operator.
+
+This will query for movie with name `Forrest Gump` and year `1994`.
+
+They are basically the same:
+
+```python
+movie = await Movie.query(Q.and_(Movie.name == "Forrest Gump", Movie.year == 1994)).all()
+
+movie = await Movie.query(Movie.name == "Forrest Gump").query(Movie.year == 1994).all()
+```
+
+* `Q.or_()` Creating an `$or` operator.
+
+This will match movies with name `Forrest Gump` or movies with year greater than `2000`.
+
+```python
+movies = await Movie.query(Q.or_(Movie.name == "Forrest Gump", Movie.year > 2000)).all()
+```
