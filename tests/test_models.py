@@ -33,6 +33,12 @@ class Movie(Model):
         ]
 
 
+@pytest.fixture(scope="module", autouse=True)
+async def prepare_indexes() -> None:
+    await Movie.drop_indexes(force=True)
+    await Movie.create_indexes()
+
+
 def test_model_class() -> None:
     class Product(Model):
         sku: str
@@ -59,11 +65,6 @@ def test_model_class() -> None:
         },
         "required": ["name", "year"],
     }
-
-
-async def test_model_create_index() -> None:
-    index_names = await Movie.create_indexes()
-    assert index_names == ["name", "year_genre"]
 
 
 async def test_model_insert() -> None:

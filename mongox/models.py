@@ -272,6 +272,34 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         return result.deleted_count
 
     @classmethod
+    async def drop_index(cls, name: str) -> str:
+        """
+        Drop index by name.
+
+        Can raise `pymongo.errors.OperationFailure`.
+        """
+
+        await cls.Meta.collection._collection.drop_index(name)
+        return name
+
+    @classmethod
+    async def drop_indexes(
+        cls, force: bool = False
+    ) -> typing.Optional[typing.List[str]]:
+        """
+        Drop all indexes defined for the collection.
+        With `force=True`, even indexes not defined on the collection will be removed.
+
+        Can raise `pymongo.errors.OperationFailure`.
+        """
+
+        if force:
+            return await cls.Meta.collection._collection.drop_indexes()
+
+        index_names = [await cls.drop_index(index.name) for index in cls.Meta.indexes]
+        return index_names
+
+    @classmethod
     def query(
         cls: typing.Type[T], *args: typing.Union[bool, typing.Dict, QueryExpression]
     ) -> QuerySet[T]:

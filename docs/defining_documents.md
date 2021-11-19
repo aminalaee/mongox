@@ -126,6 +126,25 @@ And then, you can then create the collection indexes with:
 await Movie.create_indexes()
 ```
 
+Or to drop the indexes:
+
+```python
+await Movie.drop_indexes()
+```
+
+Note that this will only drop indexes defined in `Meta` class.
+To drop all indexes, even those not defined here you can pass `force=True`:
+
+```python
+await Movie.drop_indexes(force=True)
+```
+
+And finally if you need to drop a single index by name:
+
+```python
+await Movie.drop_index("year_genre)
+```
+
 `Index` accepts the following arguments:
 
 * `key` For single key (simple indexes).

@@ -24,7 +24,7 @@
 # MongoX
 
 MongoX is an async python ODM (Object Document Mapper) for MongoDB
-which is built on top [Motor][motor] and [Pydantic][pydantic].
+which is built on top of [Motor][motor] and [Pydantic][pydantic].
 
 The main features include:
 
