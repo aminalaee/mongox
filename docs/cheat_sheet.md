@@ -7,6 +7,9 @@ import mongox
 class Movie(mongox.Model):
     name: str
     year: int
+
+    class Meta:
+        indexes = [mongox.Index("name", unique=True)]
 ```
 
 ### Model methods
@@ -153,3 +156,43 @@ class Movie(mongox.Model):
     ```python
     movies = await Movie.query(Q.or_(Movie.name == "Hobbits", Movie.year > 2000)).all()
     ```
+
+### Indexes
+
+`Model.create_indexes()`: Creates indexes defined in `Meta` class.
+
+??? example
+    ```python
+    await Movie.create_indexes()
+    ```
+
+??? warning
+    This can raise `pymongo.errors.OperationFailure` exception.
+
+
+`Model.drop_indexes()`: Drops indexes of the collection.
+
+??? example
+    ```python
+    # Drops indexes defined in Meta class.
+    await Movie.drop_indexes()
+    ```
+
+??? example
+    ```python
+    # Drops all indexes of the collection.
+    await Movie.drop_indexes(force=True)
+    ```
+
+??? warning
+    This can raise `pymongo.errors.OperationFailure` exception.
+
+`Model.drop_index()`: Drops a single index by name.
+
+??? example
+    ```python
+    await Movie.drop_index("name")
+    ```
+
+??? warning
+    This can raise `pymongo.errors.OperationFailure` exception.
