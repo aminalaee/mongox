@@ -15,9 +15,7 @@ class QueryExpression:
     def __init__(
         self, key: typing.Union[str, "ModelField"], operator: str, value: typing.Any
     ) -> None:
-        if not isinstance(key, str):
-            key = key.alias
-        self.key = key
+        self.key = key if isinstance(key, str) else key.name
         self.operator = operator
         self.value = value
 
@@ -81,9 +79,7 @@ class SortExpression:
     """
 
     def __init__(self, key: typing.Union[str, "ModelField"], direction: Order) -> None:
-        if not isinstance(key, str):
-            key = key.alias
-        self.key = key
+        self.key = key if isinstance(key, str) else key.name
         self.direction = direction
 
     def compile(self) -> typing.Tuple[str, Order]:
