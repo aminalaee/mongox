@@ -3,7 +3,7 @@ import typing
 import pydantic
 
 from mongox.database import Collection
-from mongox.exceptions import MultipleMatchesFound, NoMatchFound
+from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound
 from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
 from mongox.index import Index, Order
@@ -257,6 +257,20 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         return self
 
     @classmethod
+    async def create_index(cls, name: str) -> str:
+        """
+        Create single index from Meta indexes by name.
+
+        Can raise `pymongo.errors.OperationFailure`.
+        """
+
+        for index in cls.Meta.indexes:
+            if index.name == name:
+                await cls.Meta.collection._collection.create_indexes([index])
+                return index.name
+        raise InvalidKeyException(f"Unable to find index: {name}")
+
+    @classmethod
     async def create_indexes(cls) -> typing.List[str]:
         """
         Create indexes defined for the collection
@@ -271,13 +285,16 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
     @classmethod
     async def drop_index(cls, name: str) -> str:
         """
-        Drop index by name.
+        Drop single index from Meta indexes by name.
 
         Can raise `pymongo.errors.OperationFailure`.
         """
 
-        await cls.Meta.collection._collection.drop_index(name)
-        return name
+        for index in cls.Meta.indexes:
+            if index.name == name:
+                await cls.Meta.collection._collection.drop_index(name)
+                return name
+        raise InvalidKeyException(f"Unable to find index: {name}")
 
     @classmethod
     async def drop_indexes(

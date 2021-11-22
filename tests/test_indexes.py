@@ -3,9 +3,9 @@ import os
 import typing
 
 import pytest
-from pymongo import errors
 
 from mongox.database import Client
+from mongox.exceptions import InvalidKeyException
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order
 from mongox.models import Model
@@ -34,11 +34,19 @@ async def test_create_indexes() -> None:
     index_names = await Movie.create_indexes()
     assert index_names == ["name", "year_genre"]
 
+    await Movie.drop_indexes()
+
+    index = await Movie.create_index("name")
+    assert index == "name"
+
+    with pytest.raises(InvalidKeyException):
+        await Movie.create_index("random_index")
+
 
 async def test_drop_index() -> None:
     await Movie.drop_index("name")
 
-    with pytest.raises(errors.OperationFailure):
+    with pytest.raises(InvalidKeyException):
         await Movie.drop_index("random_index")
 
 

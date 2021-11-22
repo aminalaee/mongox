@@ -8,3 +8,7 @@ class NoMatchFound(QueryException):
 
 class MultipleMatchesFound(QueryException):
     pass
+
+
+class InvalidKeyException(QueryException):
+    pass
