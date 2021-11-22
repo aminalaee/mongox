@@ -159,6 +159,16 @@ class Movie(mongox.Model):
 
 ### Indexes
 
+`Model.create_index()`: Creates a single index defined in `Meta` class.
+
+??? example
+    ```python
+    await Movie.create_index("name")
+    ```
+
+??? warning
+    This can raise `mongox.InvalidKeyException` if index is not found in `Meta` class.
+
 `Model.create_indexes()`: Creates indexes defined in `Meta` class.
 
 ??? example
@@ -195,4 +205,4 @@ class Movie(mongox.Model):
     ```
 
 ??? warning
-    This can raise `pymongo.errors.OperationFailure` exception.
+    This can raise `mongox.InvalidKeyException` if index is not found in `Meta` class.

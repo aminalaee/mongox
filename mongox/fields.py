@@ -6,9 +6,6 @@ from pydantic.fields import ModelField as PydanticModelField
 
 from mongox.expressions import QueryExpression
 
-if typing.TYPE_CHECKING:  # pragma: no cover
-    from mongox.models import Model
-
 __all__ = ["Field", "ObjectId"]
 
 
@@ -32,19 +29,12 @@ class ObjectId(bson.ObjectId):
         field_schema.update(type="string")
 
 
-class ModelField:
+class ModelField(PydanticModelField):
     """
     Custom ModelField to create query building
     """
 
-    __slots__: typing.Tuple[str, ...] = ("mongox_model", "name", "pydantic_field")
-
-    def __init__(
-        self, mongox_model: "Model", pydantic_field: PydanticModelField
-    ) -> None:
-        self.mongox_model = mongox_model
-        self.name = pydantic_field.alias
-        self.pydantic_field = pydantic_field
+    __slots__: typing.Tuple[str, ...] = tuple()
 
     def __lt__(self, other: typing.Any) -> QueryExpression:
         return QueryExpression(self.name, "$lt", other)

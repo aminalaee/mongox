@@ -1,3 +1,4 @@
+import copy
 import typing
 
 import pydantic
@@ -214,28 +215,30 @@ class Meta(pydantic.BaseConfig):
 
 
 class ModelMetaClass(pydantic.main.ModelMetaclass):
-    __mongox_fields__: typing.Dict[str, ModelField]
+    __fields__: typing.Dict[str, pydantic.fields.ModelField]
 
     @typing.no_type_check
     def __new__(mcs, name, bases, namespace, **kwargs):
         cls = super().__new__(mcs, name, bases, namespace, **kwargs)
 
-        mongox_fields: typing.Dict[str, ModelField] = {}
+        new_fields: typing.Dict[str, pydantic.fields.ModelField] = {}
 
         for field_name, field in cls.__fields__.items():
-            model_field = ModelField(mongox_model=cls, pydantic_field=field)
-            mongox_fields[field_name] = model_field
+            # Swapping pydantic ModelField with MongoX ModelField
+            new_field = copy.deepcopy(field)
+            new_field.__class__ = ModelField
+            new_fields[field_name] = new_field
 
-        cls.__mongox_fields__ = mongox_fields
+        cls.__fields__ = new_fields
         return cls
 
     def __getattribute__(self, name: str) -> typing.Any:
         try:
             return super().__getattribute__(name)
         except AttributeError as exc:
-            if name not in self.__mongox_fields__:
+            if name not in self.__fields__:
                 raise exc
-            return self.__mongox_fields__[name]
+            return self.__fields__[name]
 
 
 class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
