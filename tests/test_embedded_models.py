@@ -60,6 +60,12 @@ async def test_embedded_model() -> None:
     movie = await Movie.query(Movie.genre.title == "Action").get()
     assert movie.name == "Saving Private Ryan"
 
+    movie = await Movie.query({Movie.genre.title: "Action"}).get()
+    assert movie.name == "Saving Private Ryan"
+
+    movie = await Movie.query({"genre.title": "Action"}).get()
+    assert movie.name == "Saving Private Ryan"
+
     movie = await Movie.query(Movie.genre == genre).get()
     assert movie.name == "Saving Private Ryan"
 
