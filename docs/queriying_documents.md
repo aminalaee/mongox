@@ -356,14 +356,20 @@ You can then query the movie by embedded model fields:
 await Movie.query(Movie.genre.name == "Action").get()
 ```
 
-This will be equivalent to:
+This will be equivalent to following filter:
 
 ```json
-db.movies.find_one({"genre.name": "Action"})
+{"genre.name": "Action"}
 ```
 
 Or by using the complete embedded model:
 
 ```python
 await Movie.query(Movie.genre == genre).get()
+```
+
+This will be equivalent to following filter:
+
+```json
+{"genre": {"name": "Action"}}
 ```
