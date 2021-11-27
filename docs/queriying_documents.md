@@ -356,7 +356,7 @@ You can then query the movie by embedded model fields:
 await Movie.query(Movie.genre.name == "Action").get()
 ```
 
-This will be equivalent to following filter:
+This will be equivalent to the following filter:
 
 ```json
 {"genre.name": "Action"}
@@ -368,7 +368,7 @@ Or by using the complete embedded model:
 await Movie.query(Movie.genre == genre).get()
 ```
 
-This will be equivalent to following filter:
+This will be equivalent to the following filter:
 
 ```json
 {"genre": {"name": "Action"}}
