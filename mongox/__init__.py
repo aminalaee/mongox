@@ -4,7 +4,7 @@ from mongox.database import Client, Collection, Database
 from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound
 from mongox.fields import Field, ObjectId
 from mongox.index import Index, IndexType, Order
-from mongox.models import Model, Q
+from mongox.models import EmbeddedModel, Model, Q
 
 __all__ = [
     "Client",
@@ -18,6 +18,7 @@ __all__ = [
     "Index",
     "IndexType",
     "Order",
+    "EmbeddedModel",
     "Model",
     "Q",
 ]

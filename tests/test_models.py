@@ -36,6 +36,7 @@ class Movie(Model):
 @pytest.fixture(scope="module", autouse=True)
 async def prepare_indexes() -> None:
     await Movie.drop_indexes(force=True)
+    await Movie.query().delete()
     await Movie.create_indexes()
 
 

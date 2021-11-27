@@ -1,4 +1,3 @@
-import copy
 import typing
 
 import pydantic
@@ -11,7 +10,7 @@ from mongox.index import Index, Order
 
 T = typing.TypeVar("T", bound="Model")
 
-__all__ = ["Model", "Q"]
+__all__ = ["EmbeddedModel", "Model", "Q"]
 
 
 class Q:
@@ -194,8 +193,7 @@ class QuerySet(typing.Generic[T]):
 
         for arg in args:
             for key, value in arg.items():
-                if isinstance(key, ModelField):
-                    key = key.name
+                key = key._name if isinstance(key, ModelField) else key
                 kwargs[key] = value
 
             query_expression = QueryExpression(key, "$eq", value)
@@ -215,35 +213,57 @@ class Meta(pydantic.BaseConfig):
 
 
 class ModelMetaClass(pydantic.main.ModelMetaclass):
-    __fields__: typing.Dict[str, pydantic.fields.ModelField]
+    __mongox_fields__: typing.Dict[str, ModelField]
 
     @typing.no_type_check
     def __new__(mcs, name, bases, namespace, **kwargs):
         cls = super().__new__(mcs, name, bases, namespace, **kwargs)
 
-        new_fields: typing.Dict[str, pydantic.fields.ModelField] = {}
+        mongox_fields: typing.Dict[str, ModelField] = {}
 
         for field_name, field in cls.__fields__.items():
             # Swapping pydantic ModelField with MongoX ModelField
-            new_field = copy.deepcopy(field)
-            new_field.__class__ = ModelField
-            new_fields[field_name] = new_field
+            new_field = ModelField(pydantic_field=field, model_cls=field.type_)
+            mongox_fields[field_name] = new_field
 
-        cls.__fields__ = new_fields
+        cls.__mongox_fields__ = mongox_fields
         return cls
 
-    def __getattribute__(self, name: str) -> typing.Any:
-        try:
-            return super().__getattribute__(name)
-        except AttributeError as exc:
-            if name not in self.__fields__:
-                raise exc
-            return self.__fields__[name]
+    def __getattr__(self, name: str) -> typing.Any:
+        if name in self.__mongox_fields__:
+            return self.__mongox_fields__[name]
+        return super().__getattribute__(name)
+
+
+class EmbeddedModelMetaClass(pydantic.main.ModelMetaclass):
+    __mongox_fields__: typing.Dict[str, ModelField]
+
+    @typing.no_type_check
+    def __new__(mcs, name, bases, namespace, **kwargs):
+        cls = super().__new__(mcs, name, bases, namespace, **kwargs)
+
+        mongox_fields: typing.Dict[str, ModelField] = {}
+
+        for field_name, field in cls.__fields__.items():
+            # Swapping pydantic ModelField with MongoX ModelField
+            new_field = ModelField(pydantic_field=field, model_cls=cls)
+            mongox_fields[field_name] = new_field
+
+        cls.__mongox_fields__ = mongox_fields
+        return cls
+
+
+class EmbeddedModel(pydantic.BaseModel, metaclass=EmbeddedModelMetaClass):
+    __mongox_fields__: typing.Dict[str, ModelField]
+
+    class Config:
+        validate_assignment = True
 
 
 class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
-    Meta: typing.ClassVar[Meta]
+    __mongox_fields__: typing.Dict[str, ModelField]
 
+    Meta: typing.ClassVar[Meta]
     id: typing.Optional[ObjectId] = pydantic.Field(alias="_id")
 
     class Config:
@@ -282,6 +302,10 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         return await cls.Meta.collection._collection.create_indexes(cls.Meta.indexes)
 
     async def delete(self) -> int:
+        """
+        Delete the current document.
+        """
+
         result = await self.Meta.collection._collection.delete_one({"_id": self.id})
         return result.deleted_count
 

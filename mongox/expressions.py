@@ -15,15 +15,35 @@ class QueryExpression:
     def __init__(
         self, key: typing.Union[str, "ModelField"], operator: str, value: typing.Any
     ) -> None:
-        self.key = key if isinstance(key, str) else key.alias
+        self.key = key if isinstance(key, str) else key._name
         self.operator = operator
         self.value = value
+
+    @property
+    def compiled_value(self) -> typing.Any:
+        """
+        Prepare value for query by trying to cast to a map first.
+        """
+
+        if isinstance(self.value, list):
+            return [self._map(v) for v in self.value]
+        else:
+            return self._map(self.value)
+
+    def _map(self, v: typing.Any) -> typing.Any:
+        """
+        Map to a dictionary if the value supports a mapping interface
+        """
+        try:
+            return v.dict()
+        except AttributeError:
+            return v
 
     def compile(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
         """
         Compile QueryExpression to a Dict as MongoDB expects.
         """
-        return {self.key: {self.operator: self.value}}
+        return {self.key: {self.operator: self.compiled_value}}
 
     @classmethod
     def compile_many(
@@ -79,7 +99,7 @@ class SortExpression:
     """
 
     def __init__(self, key: typing.Union[str, "ModelField"], direction: Order) -> None:
-        self.key = key if isinstance(key, str) else key.alias
+        self.key = key if isinstance(key, str) else key._name
         self.direction = direction
 
     def compile(self) -> typing.Tuple[str, Order]:

@@ -192,3 +192,27 @@ Index(keys=[("year", IndexType.HASHED)], name="year_index", background=True)
 * `TEXT`
 
 For a full list of allowed arguments you can refer to the PyMongo docs [here](https://pymongo.readthedocs.io/en/stable/api/pymongo/operations.html#pymongo.operations.IndexModel).
+
+### Embedded Models
+
+Embedded Models are models to be embedded in `mongox.Model`.
+The difference is that `EmbeddedModel`s won't be inserted separately
+and won't get their seaparate `_id`.
+
+To define Embedded Models you should inherit from `mongox.EmbeddedModel`
+and define the fields the same as Pydantic.
+
+```python
+import mongox
+
+
+class Genre(mongox.EmbeddedModel):
+    title: str
+
+
+class Movie(mongox.Model):
+    name: str
+    genre: Genre
+```
+
+You can use `EmbeddedModel` to define multi-level nested objects in MongoDB.

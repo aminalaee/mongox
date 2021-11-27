@@ -14,7 +14,7 @@ class Movie(mongox.Model):
 
 ### Model methods
 
-`insert`: Inserts the collection.
+`insert`: Inserts the document.
 
 ??? example
     ```python
@@ -67,14 +67,14 @@ class Movie(mongox.Model):
     await movie.delete()
     ```
 
-`limit`: To limit number of collections returned.
+`limit`: To limit number of documents returned.
 
 ??? example
     ```python
     movies = await Movie.query().limit(5).all()
     ```
 
-`skip`: To skip number of collections for returning results.
+`skip`: To skip number of documents for returning results.
 
 ??? example
     ```python
@@ -103,7 +103,7 @@ class Movie(mongox.Model):
     movies = await Movie.query(Movie.name > 2000, Movie.name < 2020).all()
     ```
 
-`save`: Saves the collection with the current keys and values.
+`save`: Saves the document with the current keys and values.
 
 ??? example
     ```python
