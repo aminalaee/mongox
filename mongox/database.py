@@ -44,11 +44,12 @@ class Client:
     def __init__(
         self,
         uri: str = "mongodb://localhost:27017",
-        get_event_loop: typing.Callable[[], asyncio.AbstractEventLoop] = None,
+        get_event_loop: typing.Callable[
+            [], asyncio.AbstractEventLoop
+        ] = asyncio.get_event_loop,
     ) -> None:
         self._client = AsyncIOMotorClient(uri)
-        if get_event_loop:
-            self._client.get_io_loop = get_event_loop
+        self._client.get_io_loop = get_event_loop
 
     @property
     def address(self) -> typing.Tuple[str, int]:
