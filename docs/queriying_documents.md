@@ -1,3 +1,14 @@
+Let's say we have defined the following documents:
+
+```python
+import mongox
+
+
+class Movie(mongox.Model):
+    name: str
+    year: int
+```
+
 ### Inserting documents
 
 In order to work with documents we'll first need to insert some.
@@ -13,6 +24,12 @@ Of course we can also do it in two steps:
 ```python
 movie = Movie(name="Forrest Gump", year=1994)
 movie = await movie.insert()
+```
+
+This will insert the following document in MongoDB:
+
+```json
+{"name": "Forrest Gump", "year": 1994}
 ```
 
 The great thing about MongoX is that since it's fully type annotated,
@@ -300,4 +317,53 @@ This will match movies with name `Forrest Gump` or movies with year greater than
 
 ```python
 movies = await Movie.query(Q.or_(Movie.name == "Forrest Gump", Movie.year > 2000)).all()
+```
+
+### Embedded Models
+
+Now we change our `Movie` class to include a `Genre`:
+
+```python
+import mongox
+
+
+class Genre(mongox.EmbeddedModel):
+    name: str
+
+
+class Movie(mongox.Model):
+    name: str
+    year: int
+```
+
+then we can create `Movie` instances with `Genre`:
+
+```python
+genre = Genre(name="Action")
+
+await Movie(name="Saving Private Ryan", genre=genre).insert()
+```
+
+This will create the following document in MongoDB:
+
+```json
+{"name": "Saving Private Ryan", "genre": {"name": "Action"}}
+```
+
+You can then query the movie by embedded model fields:
+
+```python
+await Movie.query(Movie.genre.name == "Action").get()
+```
+
+This will be equivalent to:
+
+```json
+db.movies.find_one({"genre.name": "Action"})
+```
+
+Or by using the complete embedded model:
+
+```python
+await Movie.query(Movie.genre == genre).get()
 ```

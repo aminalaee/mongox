@@ -215,28 +215,4 @@ class Movie(mongox.Model):
     genre: Genre
 ```
 
-and now you can create `Movie` instances with `Genre`:
-
-```python
-genre = Genre(title="Action")
-
-await Movie(name="Saving Private Ryan", genre=genre).insert()
-```
-
-This will create the following collection:
-
-```json
-{"name": "Saving Private Ryan", "genre": {"title": "Action"}}
-```
-
-You can then query the movie by embedded model fields:
-
-```python
-await Movie.query(Movie.genre.name == "Action").get()
-```
-
-Or by using the complete embedded model:
-
-```python
-await Movie.query(Movie.genre == genre).get()
-```
+You can use `EmbeddedModel` to define multi-level nested objects in MongoDB.

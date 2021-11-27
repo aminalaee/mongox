@@ -10,7 +10,7 @@ db = client.get_database("test_db")
 
 
 class Genre(mongox.EmbeddedModel):
-    title: str = mongox.Field(min_length=5)
+    name: str = mongox.Field(min_length=5)
 
 
 class Movie(mongox.Model):
@@ -22,14 +22,14 @@ class Movie(mongox.Model):
 
 
 async def main():
-    genre = Genre(title="Action")
+    genre = Genre(name="Action")
     await Movie(name="Saving Private Ryan", genre=genre).insert()
 
-    movie = await Movie.query(Movie.genre.title == "Action").get()
+    movie = await Movie.query(Movie.genre.name == "Action").get()
 
     print(movie)
 
-    movie.genre.title = "History"
+    movie.genre.name = "History"
     movie = await movie.save()
 
     print(movie)
