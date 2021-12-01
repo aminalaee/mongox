@@ -10,9 +10,7 @@ import asyncio
 
 import mongox
 
-client = mongox.Client(
-    "mongodb://localhost:27017", get_event_loop=asyncio.get_running_loop
-)
+client = mongox.Client("mongodb://localhost:27017")
 db = client.get_database("test_db")
 
 
@@ -23,6 +21,20 @@ class Movie(mongox.Model):
     class Meta:
         collection = db.get_collection("movies")
 ```
+
+First we create a `mongox.Client` instance with the MongoDB URI.
+Then we get a database from client by calling `.get_database()`.
+
+If you want to have more control over the client event loop,
+you can specify a callable to get event loop at runtime:
+
+```python
+client = mongox.Client(
+    "mongodb://localhost:27017", get_event_loop=asyncio.get_running_loop
+)
+```
+
+By default, `mongox.Client` will use `asyncio.get_running_loop`.
 
 Model attributes are defined the same way as Pydantic. The `Movie` class
 is both a mongox `Model` and also a pydantic `BaseModel`.

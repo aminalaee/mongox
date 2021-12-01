@@ -62,9 +62,7 @@ import asyncio
 
 import mongox
 
-client = mongox.Client(
-    "mongodb://localhost:27017", get_event_loop=asyncio.get_running_loop
-)
+client = mongox.Client("mongodb://localhost:27017")
 db = client.get_database("test_db")
 
 

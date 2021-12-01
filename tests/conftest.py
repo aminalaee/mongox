@@ -7,7 +7,7 @@ import pytest
 from mongox.database import Client
 
 database_uri = os.environ.get("DATABASE_URI", "mongodb://localhost:27017")
-client = Client(get_event_loop=asyncio.get_running_loop)
+client = Client(database_uri, get_event_loop=asyncio.get_running_loop)
 
 
 @pytest.fixture(scope="session")
