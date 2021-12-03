@@ -3,6 +3,7 @@ import os
 
 import pytest
 from starlette.applications import Starlette
+from starlette.requests import Request
 from starlette.responses import Response
 from starlette.testclient import TestClient
 
@@ -32,15 +33,15 @@ async def prepare_database() -> None:
 
 
 @app.route("/", methods=["POST"])
-async def create_movies(request):
+async def create_movies(request: Request) -> Response:
     data = await request.json()
     movie = await Movie(**data).insert()
     return Response(movie.json(), media_type="application/json")
 
 
 @app.route("/", methods=["GET"])
-async def get_movies(request):
-    movie = await Movie.query().first()
+async def get_movies(request: Request) -> Response:
+    movie = await Movie.query().get()
     return Response(movie.json(), media_type="application/json")
 
 
