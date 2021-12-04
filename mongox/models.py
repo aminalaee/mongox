@@ -1,5 +1,6 @@
 import typing
 
+import bson
 import pydantic
 
 from mongox.database import Collection
@@ -268,6 +269,9 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
 
     class Config:
         validate_assignment = True
+        json_encoders = {
+            bson.ObjectId: str,
+        }
 
     async def insert(self: T) -> T:
         """
