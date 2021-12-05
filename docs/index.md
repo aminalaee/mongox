@@ -17,11 +17,14 @@
 <a href="https://pypi.org/project/mongox/">
     <img src="https://badge.fury.io/py/mongox.svg" alt="Package version">
 </a>
+<a href="https://pypi.org/project/mongox" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/mongox.svg?color=%2334D058" alt="Supported Python versions">
+</a>
 </p>
 
 ---
 
-# MongoX
+# MongoX - familiar async Python MongoDB ODM
 
 MongoX is an async python ODM (Object Document Mapper) for MongoDB
 which is built on top of [Motor][motor] and [Pydantic][pydantic].
