@@ -1,4 +1,4 @@
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 from mongox.database import Client, Collection, Database
 from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound
