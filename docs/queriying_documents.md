@@ -333,7 +333,7 @@ class Genre(mongox.EmbeddedModel):
 
 class Movie(mongox.Model):
     name: str
-    year: int
+    genre: Genre
 ```
 
 then we can create `Movie` instances with `Genre`:
