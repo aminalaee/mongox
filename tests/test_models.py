@@ -106,6 +106,27 @@ async def test_model_get() -> None:
         await Movie.query().get()
 
 
+async def test_model_get_or_create() -> None:
+    movie = await Movie.query({Movie.name: "Forrest Gump"}).get_or_create({Movie.year: 2003})
+    assert movie.name == "Forrest Gump"
+    assert movie.year == 2003
+
+    movie = await Movie.query({Movie.name: "Forrest Gump", Movie.year: 2003}).get_or_create()
+    assert movie.name == "Forrest Gump"
+    assert movie.year == 2003
+
+    movie = await Movie.query({Movie.name: "Venom"}).get_or_create({Movie.year: 2021})
+    assert movie.name == "Venom"
+    assert movie.year == 2021
+
+    movie = await Movie.query({Movie.name: "Eternals", Movie.year: 2021}).get_or_create()
+    assert movie.name == "Eternals"
+    assert movie.year == 2021
+
+    with pytest.raises(MultipleMatchesFound):
+        await Movie.query().get_or_create()
+
+
 async def test_model_first() -> None:
     movie = await Movie.query({Movie.name: "Avengers"}).first()
     assert movie is None
@@ -117,7 +138,7 @@ async def test_model_first() -> None:
 
 async def test_model_count() -> None:
     count = await Movie.query().count()
-    assert count == 2
+    assert count == 4
 
     count = await Movie.query({Movie.year: 2013}).count()
     assert count == 1
@@ -126,24 +147,30 @@ async def test_model_count() -> None:
 async def test_model_all() -> None:
     movies = await Movie.query().all()
 
-    assert len(movies) == 2
+    assert len(movies) == 4
 
 
 async def test_model_sort() -> None:
     movies = await Movie.query().sort("name", Order.ASCENDING).all()
 
     assert movies[0].name == "Batman"
-    assert movies[1].name == "Forrest Gump"
+    assert movies[1].name == "Eternals"
+    assert movies[2].name == "Forrest Gump"
+    assert movies[3].name == "Venom"
 
     movies = await Movie.query().sort(Movie.name, Order.ASCENDING).all()
 
     assert movies[0].name == "Batman"
-    assert movies[1].name == "Forrest Gump"
+    assert movies[1].name == "Eternals"
+    assert movies[2].name == "Forrest Gump"
+    assert movies[3].name == "Venom"
 
     movies = await Movie.query().sort([(Movie.name, Order.DESCENDING)]).all()
 
-    assert movies[0].name == "Forrest Gump"
-    assert movies[1].name == "Batman"
+    assert movies[0].name == "Venom"
+    assert movies[1].name == "Forrest Gump"
+    assert movies[2].name == "Eternals"
+    assert movies[3].name == "Batman"
 
     movies = (
         await Movie.query()
@@ -151,8 +178,10 @@ async def test_model_sort() -> None:
         .all()
     )
 
-    assert movies[0].name == "Forrest Gump"
-    assert movies[1].name == "Batman"
+    assert movies[0].name == "Venom"
+    assert movies[1].name == "Forrest Gump"
+    assert movies[2].name == "Eternals"
+    assert movies[3].name == "Batman"
 
     movies = (
         await Movie.query()
@@ -161,25 +190,33 @@ async def test_model_sort() -> None:
         .all()
     )
 
-    assert movies[0].name == "Forrest Gump"
-    assert movies[1].name == "Batman"
+    assert movies[0].name == "Venom"
+    assert movies[1].name == "Forrest Gump"
+    assert movies[2].name == "Eternals"
+    assert movies[3].name == "Batman"
 
     movies = await Movie.query().sort(Q.asc(Movie.name)).all()
     assert movies[0].name == "Batman"
-    assert movies[1].name == "Forrest Gump"
+    assert movies[1].name == "Eternals"
+    assert movies[2].name == "Forrest Gump"
+    assert movies[3].name == "Venom"
 
     movies = await Movie.query().sort(Q.desc(Movie.name)).sort(Q.asc(Movie.year)).all()
-    assert movies[0].name == "Forrest Gump"
-    assert movies[1].name == "Batman"
+    assert movies[0].name == "Venom"
+    assert movies[1].name == "Forrest Gump"
+    assert movies[2].name == "Eternals"
+    assert movies[3].name == "Batman"
 
 
 async def test_model_skip() -> None:
     movies = await Movie.query().sort(Movie.name, Order.ASCENDING).skip(1).all()
-    assert len(movies) == 1
-    assert movies[0].name == "Forrest Gump"
+    assert len(movies) == 3
+    assert movies[0].name == "Eternals"
+    assert movies[1].name == "Forrest Gump"
+    assert movies[2].name == "Venom"
 
-    movie = await Movie.query().sort(Movie.name, Order.ASCENDING).skip(1).get()
-    assert movie.name == "Forrest Gump"
+    movie = await Movie.query().sort(Movie.name, Order.ASCENDING).skip(3).get()
+    assert movie.name == "Venom"
 
 
 async def test_model_limit() -> None:
@@ -191,7 +228,7 @@ async def test_model_limit() -> None:
         await Movie.query().sort(Movie.name, Order.ASCENDING).skip(1).limit(1).all()
     )
     assert len(movies) == 1
-    assert movies[0].name == "Forrest Gump"
+    assert movies[0].name == "Eternals"
 
 
 async def test_model_delete() -> None:
@@ -199,7 +236,7 @@ async def test_model_delete() -> None:
     assert count == 1
 
     count = await Movie.query().delete()
-    assert count == 1
+    assert count == 3
 
     movie = await Movie(name="Batman", year=2007).insert()
     count = await movie.delete()
