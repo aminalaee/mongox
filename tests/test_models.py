@@ -107,11 +107,15 @@ async def test_model_get() -> None:
 
 
 async def test_model_get_or_create() -> None:
-    movie = await Movie.query({Movie.name: "Forrest Gump"}).get_or_create({Movie.year: 2003})
+    movie = await Movie.query({Movie.name: "Forrest Gump"}).get_or_create(
+        {Movie.year: 2003}
+    )
     assert movie.name == "Forrest Gump"
     assert movie.year == 2003
 
-    movie = await Movie.query({Movie.name: "Forrest Gump", Movie.year: 2003}).get_or_create()
+    movie = await Movie.query(
+        {Movie.name: "Forrest Gump", Movie.year: 2003}
+    ).get_or_create()
     assert movie.name == "Forrest Gump"
     assert movie.year == 2003
 
@@ -119,7 +123,9 @@ async def test_model_get_or_create() -> None:
     assert movie.name == "Venom"
     assert movie.year == 2021
 
-    movie = await Movie.query({Movie.name: "Eternals", Movie.year: 2021}).get_or_create()
+    movie = await Movie.query(
+        {Movie.name: "Eternals", Movie.year: 2021}
+    ).get_or_create()
     assert movie.name == "Eternals"
     assert movie.year == 2021
 

@@ -114,22 +114,16 @@ class QuerySet(typing.Generic[T]):
             raise MultipleMatchesFound()
         return objects[0]
 
-    async def get_or_create(
-        self,
-        defaults: typing.Dict[typing.Union[str, "ModelField"], typing.Any] = dict()
-    ) -> T:
+    async def get_or_create(self, defaults: typing.Dict = dict()) -> T:
         """
-        Get the only document matching or created the document 
+        Get the only document matching or created the document
         """
-        
+
         objects = await self.limit(2).all()
         if len(objects) == 2:
             raise MultipleMatchesFound()
         if len(objects) == 0:
-            data = {
-                expression.key: expression.value
-                for expression in self._filter
-            }
+            data = {expression.key: expression.value for expression in self._filter}
 
             for key, value in defaults.items():
                 key_ = key if isinstance(key, str) else key._name
