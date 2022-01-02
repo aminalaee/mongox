@@ -153,6 +153,24 @@ movies = (
 )
 ```
 
+* `get_or_create` returns the only matching document or creates it
+
+```python
+movie = (
+    await Movie.query({Movie.name: "Forrest Gump", Movie.year: 1994})
+    .get_or_create()
+)
+```
+
+The method has the ability to receive some other fields to be used for creation.
+
+```python
+movie = (
+    await Movie.query({Movie.name: "Forrest Gump", Movie.year: 1994})
+    .get_or_create({})
+)
+```
+
 * `limit` to limit number of documents returned:
 
 ```python
