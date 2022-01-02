@@ -114,6 +114,31 @@ class QuerySet(typing.Generic[T]):
             raise MultipleMatchesFound()
         return objects[0]
 
+    async def get_or_create(
+        self,
+        defaults: typing.Dict[typing.Union[str, "ModelField"], typing.Any] = dict()
+    ) -> T:
+        """
+        Get the only document matching or created the document 
+        """
+        
+        objects = await self.limit(2).all()
+        if len(objects) == 2:
+            raise MultipleMatchesFound()
+        if len(objects) == 0:
+            data = {
+                expression.key: expression.value
+                for expression in self._filter
+            }
+
+            for key, value in defaults.items():
+                key_ = key if isinstance(key, str) else key._name
+                data[key_] = value
+
+            result = await self._collection.insert_one(data)
+            return self._cls_model(**data, id=result.inserted_id)
+        return objects[0]
+
     def limit(self, count: int = 0) -> "QuerySet[T]":
         """
         Limit query results
