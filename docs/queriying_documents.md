@@ -162,12 +162,12 @@ movie = (
 )
 ```
 
-The method has the ability to receive some other fields to be used for creation.
+The method has the ability to receive some other fields to be used for creation when document has not been found.
 
 ```python
 movie = (
-    await Movie.query({Movie.name: "Forrest Gump", Movie.year: 1994})
-    .get_or_create({})
+    await Movie.query({Movie.name: "Forrest Gump"})
+    .get_or_create({Movie.year: 1994})
 )
 ```
 
