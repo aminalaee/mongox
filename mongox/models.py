@@ -119,19 +119,17 @@ class QuerySet(typing.Generic[T]):
         Get the only document matching or created the document
         """
 
-        objects = await self.limit(2).all()
-        if len(objects) == 2:
-            raise MultipleMatchesFound()
-        if len(objects) == 0:
-            data = {expression.key: expression.value for expression in self._filter}
+        try:
+            return await self.get()
+        except NoMatchFound:
+            ...
 
-            for key, value in defaults.items():
-                key_ = key if isinstance(key, str) else key._name
-                data[key_] = value
+        data = {expression.key: expression.value for expression in self._filter}
+        for key, value in defaults.items():
+            key_ = key if isinstance(key, str) else key._name
+            data[key_] = value
 
-            result = await self._collection.insert_one(data)
-            return self._cls_model(**data, id=result.inserted_id)
-        return objects[0]
+        return await self._cls_model(**data).insert()
 
     def limit(self, count: int = 0) -> "QuerySet[T]":
         """
