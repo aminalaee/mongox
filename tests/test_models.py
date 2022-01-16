@@ -395,6 +395,3 @@ async def test_model_get_or_create() -> None:
     ).get_or_create()
     assert movie.name == "Eternals"
     assert movie.year == 2021
-
-    with pytest.raises(MultipleMatchesFound):
-        await Movie.query().get_or_create()

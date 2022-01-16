@@ -119,17 +119,20 @@ class QuerySet(typing.Generic[T]):
         Get the only document matching or created the document
         """
 
-        try:
-            return await self.get()
-        except NoMatchFound:
-            ...
-
         data = {expression.key: expression.value for expression in self._filter}
-        for key, value in defaults.items():
-            key_ = key if isinstance(key, str) else key._name
-            data[key_] = value
+        defaults = {
+            (key if isinstance(key, str) else key._name): value
+            for key, value in defaults.items()
+        }
 
-        return await self._cls_model(**data).insert()
+        temporal_model = self._cls_model(**{**defaults, **data})
+        model = await self._collection.find_one_and_update(
+            data,
+            {"$setOnInsert": temporal_model.dict(exclude={"id"})},
+            upsert=True,
+            return_document=True,
+        )
+        return self._cls_model(**model)
 
     def limit(self, count: int = 0) -> "QuerySet[T]":
         """
