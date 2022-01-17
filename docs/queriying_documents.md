@@ -153,7 +153,7 @@ movies = (
 )
 ```
 
-* `get_or_create` returns the only matching document or creates it
+* `get_or_create` returns the only matching document or creates it with default arguments.
 
 ```python
 movie = (
@@ -169,6 +169,12 @@ movie = (
     await Movie.query({Movie.name: "Forrest Gump"})
     .get_or_create({Movie.year: 1994})
 )
+```
+
+Here the `Movie` will be queried by name `Forrest Gump` and if not found, it will be created with:
+
+```json
+{"name": "Forrest Gump", "year": 1994}
 ```
 
 * `limit` to limit number of documents returned:

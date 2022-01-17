@@ -116,7 +116,7 @@ class QuerySet(typing.Generic[T]):
 
     async def get_or_create(self, defaults: typing.Dict = dict()) -> T:
         """
-        Get the only document matching or created the document
+        Get the only document matching or create the document
         """
 
         data = {expression.key: expression.value for expression in self._filter}

@@ -33,7 +33,7 @@ class Movie(Model):
         ]
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 async def prepare_database() -> None:
     await Movie.drop_indexes(force=True)
     await Movie.query().delete()
@@ -85,6 +85,8 @@ async def test_model_insert() -> None:
 
 
 async def test_model_get() -> None:
+    await Movie(name="Forrest Gump", year=2003).insert()
+
     movie = await Movie.query().get()
     assert movie.name == "Forrest Gump"
 
@@ -107,6 +109,8 @@ async def test_model_get() -> None:
 
 
 async def test_model_first() -> None:
+    await Movie(name="Batman", year=2013).insert()
+
     movie = await Movie.query({Movie.name: "Avengers"}).first()
     assert movie is None
 
@@ -117,7 +121,9 @@ async def test_model_first() -> None:
 
 async def test_model_count() -> None:
     count = await Movie.query().count()
-    assert count == 2
+    assert count == 0
+
+    await Movie(name="Batman", year=2013).insert()
 
     count = await Movie.query({Movie.year: 2013}).count()
     assert count == 1
@@ -125,11 +131,18 @@ async def test_model_count() -> None:
 
 async def test_model_all() -> None:
     movies = await Movie.query().all()
+    assert len(movies) == 0
 
-    assert len(movies) == 2
+    await Movie(name="Forrest Gump", year=2003).insert()
+
+    movies = await Movie.query().all()
+    assert len(movies) == 1
 
 
 async def test_model_sort() -> None:
+    await Movie(name="Forrest Gump", year=2003).insert()
+    await Movie(name="Batman", year=2013).insert()
+
     movies = await Movie.query().sort("name", Order.ASCENDING).all()
 
     assert movies[0].name == "Batman"
@@ -174,6 +187,9 @@ async def test_model_sort() -> None:
 
 
 async def test_model_skip() -> None:
+    await Movie(name="Forrest Gump", year=2003).insert()
+    await Movie(name="Batman", year=2013).insert()
+
     movies = await Movie.query().sort(Movie.name, Order.ASCENDING).skip(1).all()
     assert len(movies) == 1
     assert movies[0].name == "Forrest Gump"
@@ -183,6 +199,9 @@ async def test_model_skip() -> None:
 
 
 async def test_model_limit() -> None:
+    await Movie(name="Forrest Gump", year=2003).insert()
+    await Movie(name="Batman", year=2013).insert()
+
     movies = await Movie.query().sort(Movie.name, Order.ASCENDING).limit(1).all()
     assert len(movies) == 1
     assert movies[0].name == "Batman"
@@ -195,6 +214,9 @@ async def test_model_limit() -> None:
 
 
 async def test_model_delete() -> None:
+    await Movie(name="Forrest Gump", year=2003).insert()
+    await Movie(name="Batman", year=2013).insert()
+
     count = await Movie.query({Movie.name: "Batman"}).delete()
     assert count == 1
 
@@ -228,14 +250,13 @@ async def test_model_bulk_update() -> None:
 
     movies = await Movie.query({Movie.year: 2004}).update({Movie.year: 2010})
     assert movies[0].year == 2010
-    assert movies[1].year == 2010
 
     movies = await Movie.query().all()
     assert movies[0].year == 2010
-    assert movies[1].year == 2010
 
 
 async def test_model_query_builder() -> None:
+    await Movie(name="Downfall", year=2004).insert()
     await Movie(name="The Two Towers", year=2002).insert()
     await Movie(name="Casablanca", year=1942).insert()
     await Movie(name="Gone with the wind", year=1939).insert()
@@ -257,12 +278,12 @@ async def test_model_query_builder() -> None:
     movie = await Movie.query(Movie.year > 2000).first()
     assert movie is not None
     assert movie.name == "Downfall"
-    assert movie.year == 2010
+    assert movie.year == 2004
 
     movie = await Movie.query(Movie.year >= 1940).first()
     assert movie is not None
     assert movie.name == "Downfall"
-    assert movie.year == 2010
+    assert movie.year == 2004
 
     movie = (
         await Movie.query(Movie.name == "Casablanca").query(Movie.year == 1942).get()
@@ -281,6 +302,12 @@ async def test_model_query_builder() -> None:
 
 
 async def test_raw_queries() -> None:
+    await Movie(name="Gone with the wind", year=1939).insert()
+    await Movie(name="Casablanca", year=1942).insert()
+    await Movie(name="The Two Towers", year=2002).insert()
+    await Movie(name="Downfall", year=2004).insert()
+    await Movie(name="Boyhood", year=2010).insert()
+
     movie = await Movie.query({"name": "Casablanca"}).get()
 
     assert movie.name == "Casablanca"
@@ -325,11 +352,14 @@ async def test_raw_queries() -> None:
     ).all()
 
     assert movies[0].name == "The Two Towers"
-    assert movies[1].name == "Downfall"
-    assert movies[2].name == "Boyhood"
+    assert movies[1].name == "Boyhood"
 
 
 async def test_custom_query_operators() -> None:
+    await Movie(name="The Two Towers", year=2002).insert()
+    await Movie(name="Downfall", year=2004).insert()
+    await Movie(name="Boyhood", year=2010).insert()
+
     movies = await Movie.query(Q.in_(Movie.year, [2000, 2001, 2002])).all()
 
     assert len(movies) == 1
@@ -343,15 +373,14 @@ async def test_custom_query_operators() -> None:
     )
 
     assert len(movies) == 2
-    assert movies[0].name == "Downfall"
-    assert movies[1].name == "Boyhood"
+    assert movies[0].name == "Boyhood"
+    assert movies[1].name == "Downfall"
 
     movies = await Movie.query(
         Q.or_(Movie.name == "The Two Towers", Movie.year > 2005)
     ).all()
     assert movies[0].name == "The Two Towers"
-    assert movies[1].name == "Downfall"
-    assert movies[2].name == "Boyhood"
+    assert movies[1].name == "Boyhood"
 
     movie = await Movie.query(
         Q.and_(Movie.name == "The Two Towers", Movie.year > 2000)
