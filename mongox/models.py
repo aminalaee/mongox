@@ -114,6 +114,26 @@ class QuerySet(typing.Generic[T]):
             raise MultipleMatchesFound()
         return objects[0]
 
+    async def get_or_create(self, defaults: typing.Dict = dict()) -> T:
+        """
+        Get the only document matching or created the document
+        """
+
+        data = {expression.key: expression.value for expression in self._filter}
+        defaults = {
+            (key if isinstance(key, str) else key._name): value
+            for key, value in defaults.items()
+        }
+
+        temporal_model = self._cls_model(**{**defaults, **data})
+        model = await self._collection.find_one_and_update(
+            data,
+            {"$setOnInsert": temporal_model.dict(exclude={"id"})},
+            upsert=True,
+            return_document=True,
+        )
+        return self._cls_model(**model)
+
     def limit(self, count: int = 0) -> "QuerySet[T]":
         """
         Limit query results
