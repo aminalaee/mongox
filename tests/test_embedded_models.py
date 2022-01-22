@@ -32,15 +32,12 @@ class Genre(EmbeddedModel):
     title: str
 
 
-class Movie(Model):
+class Movie(Model, db=db, collection="movies"):
     actors: typing.List[Actor]
     director: Crew
     name: str
     genre: Genre
     year: int
-
-    class Meta:
-        collection = db.get_collection("movies")
 
 
 async def test_embedded_model() -> None:
