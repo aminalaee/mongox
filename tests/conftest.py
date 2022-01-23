@@ -18,6 +18,6 @@ def event_loop() -> typing.Generator[asyncio.AbstractEventLoop, None, None]:
 
 
 @pytest.fixture(autouse=True, scope="session")
-async def test_database() -> None:
+async def test_database() -> typing.AsyncGenerator:
     yield
     await client.drop_database("test_db")
