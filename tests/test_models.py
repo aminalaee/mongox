@@ -35,6 +35,7 @@ class Movie(Model):
 
 @pytest.fixture(scope="function", autouse=True)
 async def prepare_database() -> None:
+    yield
     await Movie.drop_indexes(force=True)
     await Movie.query().delete()
     await Movie.create_indexes()
