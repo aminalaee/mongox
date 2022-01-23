@@ -9,12 +9,9 @@ client = mongox.Client(
 db = client.get_database("test_db")
 
 
-class Movie(mongox.Model):
+class Movie(mongox.Model, db=db):
     name: str
     year: int = mongox.Field(gt=1800, lt=2050)
-
-    class Meta:
-        collection = db.get_collection("movies")
 
 
 async def main():

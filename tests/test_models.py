@@ -20,17 +20,16 @@ client = Client(database_uri, get_event_loop=asyncio.get_running_loop)
 db = client.get_database("test_db")
 
 
-class Movie(Model):
+indexes = [
+    Index("name", unique=True),
+    Index(keys=[("year", Order.DESCENDING), ("genre", IndexType.HASHED)]),
+]
+
+
+class Movie(Model, db=db, indexes=indexes):
     name: str
     year: int
     uuid: typing.Optional[ObjectId]
-
-    class Meta:
-        collection = db.get_collection("movies")
-        indexes = [
-            Index("name", unique=True),
-            Index(keys=[("year", Order.DESCENDING), ("genre", IndexType.HASHED)]),
-        ]
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -54,6 +53,9 @@ def test_model_class() -> None:
         == dict(movie)
         == {"name": "Batman", "year": 2009, "id": None, "uuid": None}
     )
+
+    assert Movie.Meta.database == db
+    assert Movie.Meta.collection.name == "movies"
 
     assert Movie.schema() == {
         "title": "Movie",

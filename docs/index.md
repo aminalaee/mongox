@@ -69,12 +69,9 @@ client = mongox.Client("mongodb://localhost:27017")
 db = client.get_database("test_db")
 
 
-class Movie(mongox.Model):
+class Movie(mongox.Model, db=db, collection="movies):
     name: str
     year: int
-
-    class Meta:
-        collection = db.get_collection("movies")
 ```
 
 Now you can create some instances and insert them into the database:

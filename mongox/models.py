@@ -3,6 +3,7 @@ import typing
 import bson
 import pydantic
 
+from mongox._helpers import normalize_class_name
 from mongox.database import Collection, Database
 from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound
 from mongox.expressions import QueryExpression, SortExpression
@@ -243,10 +244,16 @@ class ModelMetaClass(pydantic.main.ModelMetaclass):
 
         if kwargs:
             cls.Meta = Meta
-        if "db" in kwargs:
+
+            assert "db" in kwargs, "DB instance required"
+            assert isinstance(kwargs["db"], Database)
             cls.Meta.database = kwargs["db"]
-        if "collection" in kwargs:
-            cls.Meta.collection = cls.Meta.database.get_collection(kwargs["collection"])
+
+            collection_name = kwargs.get(
+                "collection", normalize_class_name(cls.__name__) + "s"
+            )
+            cls.Meta.collection = kwargs["db"].get_collection(collection_name)
+            cls.Meta.indexes = kwargs.get("indexes", [])
 
         mongox_fields: typing.Dict[str, ModelField] = {}
 

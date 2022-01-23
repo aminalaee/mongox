@@ -32,7 +32,7 @@ class Genre(EmbeddedModel):
     title: str
 
 
-class Movie(Model, db=db, collection="movies"):
+class Movie(Model, db=db):
     actors: typing.List[Actor]
     director: Crew
     name: str
