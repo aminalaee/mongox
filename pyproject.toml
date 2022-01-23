@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "mongox"
-version = "0.0.3"
+version = "0.1.0"
 description = "Python Mongodb ODM using Motor and Pydantic"
 authors = ["Amin Alaee <mohammadamin.alaee@gmail.com>"]
 license = "MIT"
@@ -31,8 +31,8 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
-motor = "^2.4"
-pydantic = "^1.8.2"
+motor = ">=2,<3"
+pydantic = "^1.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0"
