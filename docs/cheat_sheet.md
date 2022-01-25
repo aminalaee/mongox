@@ -1,15 +1,17 @@
-All examples are provided for the following collection (without extra boilerplate):
+All examples are provided for the following collection:
 
 ```python
+import asyncio
+
 import mongox
 
+client = mongox.Client("mongodb://localhost:27017")
+db = client.get_database("test_db")
 
-class Movie(mongox.Model):
+
+class Movie(mongox.Model, db=db, collection="movies"):
     name: str
     year: int
-
-    class Meta:
-        indexes = [mongox.Index("name", unique=True)]
 ```
 
 ### Model methods

@@ -3,7 +3,8 @@ import typing
 import bson
 import pydantic
 
-from mongox.database import Collection
+from mongox._helpers import normalize_class_name
+from mongox.database import Collection, Database
 from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound
 from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
@@ -229,6 +230,7 @@ class QuerySet(typing.Generic[T]):
 
 
 class Meta(pydantic.BaseConfig):
+    database: Database
     collection: Collection
     indexes: typing.List[Index]
 
@@ -238,7 +240,20 @@ class ModelMetaClass(pydantic.main.ModelMetaclass):
 
     @typing.no_type_check
     def __new__(mcs, name, bases, namespace, **kwargs):
-        cls = super().__new__(mcs, name, bases, namespace, **kwargs)
+        cls = super().__new__(mcs, name, bases, namespace)
+
+        if kwargs:
+            cls.Meta = Meta
+
+            assert "db" in kwargs, "DB instance required"
+            assert isinstance(kwargs["db"], Database)
+            cls.Meta.database = kwargs["db"]
+
+            collection_name = kwargs.get(
+                "collection", normalize_class_name(cls.__name__) + "s"
+            )
+            cls.Meta.collection = kwargs["db"].get_collection(collection_name)
+            cls.Meta.indexes = kwargs.get("indexes", [])
 
         mongox_fields: typing.Dict[str, ModelField] = {}
 
