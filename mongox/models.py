@@ -205,7 +205,7 @@ class QuerySet(typing.Generic[T]):
 
         return self
 
-    async def update(self, **kwargs: typing.Dict) -> typing.List[T]:
+    async def update(self, **kwargs: typing.Any) -> typing.List[T]:
         """
         Update the matching criteria with provided info
         """
