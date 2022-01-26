@@ -237,7 +237,7 @@ You can update a document by calling `save` on it:
 ```python
 movie = await Movie.query().get()
 
-movie.name = "  "
+movie.name = "Another Movie"
 movie = await movie.save()
 ```
 
@@ -248,21 +248,12 @@ This is the equivalent of a MongoDB `updateOne`.
 You can also do bulk updates like this:
 
 ```python
-movies = await Movie.query({Movie.year: 1970}).update(year=1980)
+movies = await Movie.query({Movie.year: 1970}).update(year=1980, name="Another Movie")
 ```
 
-Here we do an update to change the `year` of all 1970 movies to 1980.
+Here we do an update to change the `year` and `name` of all 1970 movies to 1980 and the name Example to Another Movie.
 
-Now let's update multiple fields in a bulk update:
-
-```python
-movies = await Movie.query({Movie.name: "Example"}).update(year=1970, name="Another Movie")
-```
-
-Here what was done was an update of the `year` and `name` of all movies that have the name Example, the year is changed to 1970 and the name to Another Movie.
-
-The both returned results are a list of update `Movie` instances.
-This is the equivalent of `updateMany` in MongoDB.
+The returned result is a list of update Movie instances. This is the equivalent of updateMany in MongoDB.
 
 !!! note
     Note how bulk update is called on `Movie` class,
