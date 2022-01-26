@@ -274,12 +274,6 @@ async def test_model_bulk_update() -> None:
     assert movies[0].year == 2014
     assert movies[0].name == "Boyhood 2"
 
-    movies = await Movie.query({Movie.name: "Boyhood 2"}).update(
-        **{"year": 2010, "name": "Boyhood-2"}
-    )
-    assert movies[0].year == 2010
-    assert movies[0].name == "Boyhood-2"
-
 
 async def test_model_query_builder() -> None:
     await Movie(name="Downfall", year=2004).insert()
