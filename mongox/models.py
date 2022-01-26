@@ -205,27 +205,22 @@ class QuerySet(typing.Generic[T]):
 
         return self
 
-    async def update(self, *args: typing.Dict) -> typing.List[T]:
+    async def update(self, **kwargs: typing.Dict) -> typing.List[T]:
         """
         Update the matching criteria with provided info
         """
 
-        kwargs = {}
-        filter_: typing.List[QueryExpression] = []
-
-        for arg in args:
-            for key, value in arg.items():
-                key = key._name if isinstance(key, ModelField) else key
-                kwargs[key] = value
-
-            query_expression = QueryExpression(key, "$eq", value)
-            filter_.append(query_expression)
-
         filter_query = QueryExpression.compile_many(self._filter)
         await self._collection.update_many(filter_query, {"$set": kwargs})
 
-        self._filter = filter_
+        _filter = [
+            expression for expression in self._filter if expression.key not in kwargs
+        ]
+        _filter.extend(
+            [QueryExpression(key, "$eq", value) for key, value in kwargs.items()]
+        )
 
+        self._filter = _filter
         return await self.all()
 
 
