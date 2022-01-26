@@ -254,7 +254,7 @@ async def test_model_update_save() -> None:
 async def test_model_bulk_update() -> None:
     await Movie(name="Boyhood", year=2004).insert()
 
-    movies = await Movie.query({Movie.year: 2004}).update({Movie.year: 2010})
+    movies = await Movie.query({Movie.year: 2004}).update(year=2010)
     assert movies[0].year == 2010
 
     movies = await Movie.query().all()
