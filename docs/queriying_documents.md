@@ -259,7 +259,7 @@ Now let's update multiple fields in a bulk update:
 movies = await Movie.query({Movie.name: "Example"}).update(year=1970, name="Another Movie")
 ```
 
-Here what was done was an update the `year` and `name` of all movies that have the name Example, the year is changed to 1970 and the name to Another Movie.
+Here what was done was an update of the `year` and `name` of all movies that have the name Example, the year is changed to 1970 and the name to Another Movie.
 
 The both returned results are a list of update `Movie` instances.
 This is the equivalent of `updateMany` in MongoDB.
