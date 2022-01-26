@@ -253,12 +253,32 @@ async def test_model_update_save() -> None:
 
 async def test_model_bulk_update() -> None:
     await Movie(name="Boyhood", year=2004).insert()
+    await Movie(name="Boyhood-2", year=2011).insert()
 
     movies = await Movie.query({Movie.year: 2004}).update(year=2010)
     assert movies[0].year == 2010
 
     movies = await Movie.query().all()
     assert movies[0].year == 2010
+
+    movies = await Movie.query({Movie.name: "Boyhood-2"}).update(year=2010)
+    assert len(movies) == 1
+    assert movies[0].year == 2010
+
+    movies = await Movie.query({Movie.year: 2010}).all()
+    assert len(movies) == 2
+
+    movies = await Movie.query({Movie.name: "Boyhood-2"}).update(
+        year=2014, name="Boyhood 2"
+    )
+    assert movies[0].year == 2014
+    assert movies[0].name == "Boyhood 2"
+
+    movies = await Movie.query({Movie.name: "Boyhood 2"}).update(
+        **{"year": 2010, "name": "Boyhood-2"}
+    )
+    assert movies[0].year == 2010
+    assert movies[0].name == "Boyhood-2"
 
 
 async def test_model_query_builder() -> None:
