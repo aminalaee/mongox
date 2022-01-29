@@ -211,33 +211,33 @@ class QuerySet(typing.Generic[T]):
         """
 
         field_definitions = {
-            key: (value, ...)
-            for key, value in self._cls_model.__annotations__.items()
-            if key in kwargs
+            name: (annotations, ...)
+            for name, annotations in self._cls_model.__annotations__.items()
+            if name in kwargs
         }
 
-        if not field_definitions:
-            return await self.all()
+        if field_definitions:
+            TemUpdate = pydantic.create_model(
+                "TemUpdate", **field_definitions  # type: ignore
+            )
+            values, _, validation_error = pydantic.validate_model(TemUpdate, kwargs)
 
-        Model = pydantic.create_model(
-            "TemporalUpdate", **field_definitions
-        )  # type: ignore
-        data, _, errores = pydantic.validate_model(Model, kwargs)
+            if validation_error:
+                raise validation_error
 
-        if errores:
-            raise errores
+            filter_query = QueryExpression.compile_many(self._filter)
+            await self._collection.update_many(filter_query, {"$set": values})
 
-        filter_query = QueryExpression.compile_many(self._filter)
-        await self._collection.update_many(filter_query, {"$set": data})
+            _filter = [
+                expression
+                for expression in self._filter
+                if expression.key not in values
+            ]
+            _filter.extend(
+                [QueryExpression(key, "$eq", value) for key, value in values.items()]
+            )
 
-        _filter = [
-            expression for expression in self._filter if expression.key not in data
-        ]
-        _filter.extend(
-            [QueryExpression(key, "$eq", value) for key, value in data.items()]
-        )
-
-        self._filter = _filter
+            self._filter = _filter
         return await self.all()
 
 
