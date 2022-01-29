@@ -210,14 +210,31 @@ class QuerySet(typing.Generic[T]):
         Update the matching criteria with provided info
         """
 
+        field_definitions = {
+            key: (value, ...)
+            for key, value in self._cls_model.__annotations__.items()
+            if key in kwargs
+        }
+
+        if not field_definitions:
+            return await self.all()
+
+        Model = pydantic.create_model(
+            "TemporalUpdate", **field_definitions
+        )  # type: ignore
+        data, _, errores = pydantic.validate_model(Model, kwargs)
+
+        if errores:
+            raise errores
+
         filter_query = QueryExpression.compile_many(self._filter)
-        await self._collection.update_many(filter_query, {"$set": kwargs})
+        await self._collection.update_many(filter_query, {"$set": data})
 
         _filter = [
-            expression for expression in self._filter if expression.key not in kwargs
+            expression for expression in self._filter if expression.key not in data
         ]
         _filter.extend(
-            [QueryExpression(key, "$eq", value) for key, value in kwargs.items()]
+            [QueryExpression(key, "$eq", value) for key, value in data.items()]
         )
 
         self._filter = _filter
