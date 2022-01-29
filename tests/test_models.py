@@ -274,6 +274,17 @@ async def test_model_bulk_update() -> None:
     assert movies[0].year == 2014
     assert movies[0].name == "Boyhood 2"
 
+    with pytest.raises(pydantic.ValidationError):
+        movies = await Movie.query({Movie.name: "Boyhood 2"}).update(
+            year="test"
+        )
+
+    movies = await Movie.query({Movie.name: "Boyhood 2"}).update(
+        test=2021
+    )
+    assert movies[0].year == 2014
+    assert movies[0].name == "Boyhood 2"
+
 
 async def test_model_query_builder() -> None:
     await Movie(name="Downfall", year=2004).insert()
