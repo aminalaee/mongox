@@ -205,27 +205,41 @@ class QuerySet(typing.Generic[T]):
 
         return self
 
-    async def update(self, *args: typing.Dict) -> typing.List[T]:
+    async def update(self, **kwargs: typing.Any) -> typing.List[T]:
         """
         Update the matching criteria with provided info
         """
 
-        kwargs = {}
-        filter_: typing.List[QueryExpression] = []
+        field_definitions = {
+            name: (annotations, ...)
+            for name, annotations in self._cls_model.__annotations__.items()
+            if name in kwargs
+        }
 
-        for arg in args:
-            for key, value in arg.items():
-                key = key._name if isinstance(key, ModelField) else key
-                kwargs[key] = value
+        if field_definitions:
+            pydantic_model: typing.Type[pydantic.BaseModel] = pydantic.create_model(
+                self._cls_model.__name__, **field_definitions  # type: ignore
+            )
+            values, _, validation_error = pydantic.validate_model(
+                pydantic_model, kwargs
+            )
 
-            query_expression = QueryExpression(key, "$eq", value)
-            filter_.append(query_expression)
+            if validation_error:
+                raise validation_error
 
-        filter_query = QueryExpression.compile_many(self._filter)
-        await self._collection.update_many(filter_query, {"$set": kwargs})
+            filter_query = QueryExpression.compile_many(self._filter)
+            await self._collection.update_many(filter_query, {"$set": values})
 
-        self._filter = filter_
+            _filter = [
+                expression
+                for expression in self._filter
+                if expression.key not in values
+            ]
+            _filter.extend(
+                [QueryExpression(key, "$eq", value) for key, value in values.items()]
+            )
 
+            self._filter = _filter
         return await self.all()
 
 

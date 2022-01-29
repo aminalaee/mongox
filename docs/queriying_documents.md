@@ -248,13 +248,12 @@ This is the equivalent of a MongoDB `updateOne`.
 You can also do bulk updates like this:
 
 ```python
-movies = await Movie.query({Movie.year: 1970}).update({Movie.year: 1980})
+movies = await Movie.query({Movie.year: 1970}).update(year=1980, name="Another Movie")
 ```
 
-Here we do an update to change the `year` of all 1970 movies to 1980.
+Here we do an update to change the `year` and `name` of all 1970 movies to 1980 and the name Example to Another Movie.
 
-The returned result is a list of update `Movie` instances.
-This is the equivalent of `updateMany` in MongoDB.
+The returned result is a list of update Movie instances. This is the equivalent of updateMany in MongoDB.
 
 !!! note
     Note how bulk update is called on `Movie` class,
