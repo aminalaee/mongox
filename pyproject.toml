@@ -25,13 +25,14 @@ classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Database",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
-motor = ">=2,<3"
+motor = "^2.4"
 pydantic = "^1.8"
 
 [tool.poetry.dev-dependencies]
