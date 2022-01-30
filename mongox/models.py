@@ -3,7 +3,8 @@ import typing
 import bson
 import pydantic
 
-from mongox.database import Collection
+from mongox._helpers import normalize_class_name
+from mongox.database import Collection, Database
 from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound
 from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
@@ -204,31 +205,46 @@ class QuerySet(typing.Generic[T]):
 
         return self
 
-    async def update(self, *args: typing.Dict) -> typing.List[T]:
+    async def update(self, **kwargs: typing.Any) -> typing.List[T]:
         """
         Update the matching criteria with provided info
         """
 
-        kwargs = {}
-        filter_: typing.List[QueryExpression] = []
+        field_definitions = {
+            name: (annotations, ...)
+            for name, annotations in self._cls_model.__annotations__.items()
+            if name in kwargs
+        }
 
-        for arg in args:
-            for key, value in arg.items():
-                key = key._name if isinstance(key, ModelField) else key
-                kwargs[key] = value
+        if field_definitions:
+            pydantic_model: typing.Type[pydantic.BaseModel] = pydantic.create_model(
+                self._cls_model.__name__, **field_definitions  # type: ignore
+            )
+            values, _, validation_error = pydantic.validate_model(
+                pydantic_model, kwargs
+            )
 
-            query_expression = QueryExpression(key, "$eq", value)
-            filter_.append(query_expression)
+            if validation_error:
+                raise validation_error
 
-        filter_query = QueryExpression.compile_many(self._filter)
-        await self._collection.update_many(filter_query, {"$set": kwargs})
+            filter_query = QueryExpression.compile_many(self._filter)
+            await self._collection.update_many(filter_query, {"$set": values})
 
-        self._filter = filter_
+            _filter = [
+                expression
+                for expression in self._filter
+                if expression.key not in values
+            ]
+            _filter.extend(
+                [QueryExpression(key, "$eq", value) for key, value in values.items()]
+            )
 
+            self._filter = _filter
         return await self.all()
 
 
 class Meta(pydantic.BaseConfig):
+    database: Database
     collection: Collection
     indexes: typing.List[Index]
 
@@ -238,7 +254,20 @@ class ModelMetaClass(pydantic.main.ModelMetaclass):
 
     @typing.no_type_check
     def __new__(mcs, name, bases, namespace, **kwargs):
-        cls = super().__new__(mcs, name, bases, namespace, **kwargs)
+        cls = super().__new__(mcs, name, bases, namespace)
+
+        if kwargs:
+            cls.Meta = Meta
+
+            assert "db" in kwargs, "DB instance required"
+            assert isinstance(kwargs["db"], Database)
+            cls.Meta.database = kwargs["db"]
+
+            collection_name = kwargs.get(
+                "collection", normalize_class_name(cls.__name__) + "s"
+            )
+            cls.Meta.collection = kwargs["db"].get_collection(collection_name)
+            cls.Meta.indexes = kwargs.get("indexes", [])
 
         mongox_fields: typing.Dict[str, ModelField] = {}
 

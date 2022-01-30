@@ -13,12 +13,9 @@ class Genre(mongox.EmbeddedModel):
     name: str = mongox.Field(min_length=5)
 
 
-class Movie(mongox.Model):
+class Movie(mongox.Model, db=db, collection="movies"):
     name: str
     genre: Genre
-
-    class Meta:
-        collection = db.get_collection("movies")
 
 
 async def main():

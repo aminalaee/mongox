@@ -92,13 +92,13 @@ Here is the list of supported query methods:
 * `first` returns the first matching document:
 
 ```python
-movie = await Movie.query({Movie.name: "Forrest Gump"}).first()
+movie = await Movie.query(Movie.name == "Forrest Gump").first()
 ```
 
 * `get` returns the only matching document or throws exceptions:
 
 ```python
-movie = await Movie.query({Movie.name: "Forrest Gump"}).get()
+movie = await Movie.query(Movie.name == "Forrest Gump").get()
 ```
 
 !!! note
@@ -116,7 +116,7 @@ It's up to the caller to set the appropriate limits.
 * `count` returns count of documents matching the criteria:
 
 ```python
-count = await Movie.query({Movie.year: 1994}).count()
+count = await Movie.query(Movie.year == 1994).count()
 ```
 
 * `sort` to sort documents based on keys:
@@ -157,7 +157,7 @@ movies = (
 
 ```python
 movie = (
-    await Movie.query({Movie.name: "Forrest Gump", Movie.year: 1994})
+    await Movie.query(Movie.name == "Forrest Gump", Movie.year == 1994)
     .get_or_create()
 )
 ```
@@ -166,7 +166,7 @@ The method has the ability to receive some other fields to be used for creation 
 
 ```python
 movie = (
-    await Movie.query({Movie.name: "Forrest Gump"})
+    await Movie.query(Movie.name == "Forrest Gump")
     .get_or_create({Movie.year: 1994})
 )
 ```
@@ -222,9 +222,9 @@ But some of the query methods return queryset again, so you can chain them toget
 * `limit`
 
 ```python
-movies = await Movie.query({Movie.name: "Example"}).skip(10).limit(20).all()
+movies = await Movie.query(Movie.name == "Example").skip(10).limit(20).all()
 
-movies = await Movie.query({Movie.name: "Example"}).query({Movie.year: 2005}).all()
+movies = await Movie.query(Movie.name == "Example").query(Movie.year == 2005).all()
 ```
 
 ### Updating documents
@@ -248,13 +248,12 @@ This is the equivalent of a MongoDB `updateOne`.
 You can also do bulk updates like this:
 
 ```python
-movies = await Movie.query({Movie.year: 1970}).update({Movie.year: 1980})
+movies = await Movie.query(Movie.year == 1970).update(year=1980, name="Another Movie")
 ```
 
-Here we do an update to change the `year` of all 1970 movies to 1980.
+Here we do an update to change the `year` and `name` of all 1970 movies to 1980 and the name Example to Another Movie.
 
-The returned result is a list of update `Movie` instances.
-This is the equivalent of `updateMany` in MongoDB.
+The returned result is a list of update Movie instances. This is the equivalent of updateMany in MongoDB.
 
 !!! note
     Note how bulk update is called on `Movie` class,
@@ -279,7 +278,7 @@ This will remove the movie instance and it is the equivalent of a `deleteOne`.
 To delete multiple documents at the same time:
 
 ```python
-number_of_deleted = await Movie.query({Movie.year: 1980}).delete()
+number_of_deleted = await Movie.query(Movie.year == 1980).delete()
 ```
 
 This will remove all documents having `year` equal to 1980,

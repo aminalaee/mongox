@@ -14,12 +14,9 @@ client = mongox.Client("mongodb://localhost:27017")
 db = client.get_database("test_db")
 
 
-class Movie(mongox.Model):
+class Movie(mongox.Model, db=db):
     name: str
     year: int
-
-    class Meta:
-        collection = db.get_collection("movies")
 ```
 
 First we create a `mongox.Client` instance with the MongoDB URI.
@@ -105,17 +102,16 @@ Index definition should be inside the `Meta` class of the Model.
 import mongox
 
 
-class Movie(mongox.Model):
+indexes = [
+    mongox.Index("name", unique=True),
+    mongox.Index(keys=[("year", mongox.Order.DESCENDING), ("genre", mongox.IndexType.HASHED)]),
+]
+
+
+class Movie(mongox.Model, db=db, indexes=indexes):
     name: str
     genre: str
-    year: int
-
-    class Meta:
-        collection = db.get_collection("movies")
-        indexes = [
-            mongox.Index("name", unique=True),
-            mongox.Index(keys=[("year", mongox.Order.DESCENDING), ("genre", mongox.IndexType.HASHED)]),
-        ]
+    year: int 
 ```
 
 As you can see `Meta` class expects `indexes` to be a list of `Index` objects.

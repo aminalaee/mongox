@@ -17,17 +17,16 @@ client = Client(database_uri, get_event_loop=asyncio.get_running_loop)
 db = client.get_database("test_db")
 
 
-class Movie(Model):
+indexes = [
+    Index("name", unique=True),
+    Index(keys=[("year", Order.DESCENDING), ("genre", IndexType.HASHED)]),
+]
+
+
+class Movie(Model, db=db, indexes=indexes):
     name: str
     year: int
     uuid: typing.Optional[ObjectId]
-
-    class Meta:
-        collection = db.get_collection("movies")
-        indexes = [
-            Index("name", unique=True),
-            Index(keys=[("year", Order.DESCENDING), ("genre", IndexType.HASHED)]),
-        ]
 
 
 async def test_create_indexes() -> None:
