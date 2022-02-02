@@ -126,10 +126,16 @@ class QuerySet(typing.Generic[T]):
             for key, value in defaults.items()
         }
 
-        temporal_model = self._cls_model(**{**defaults, **data})
+        values, _, validation_error = pydantic.validate_model(
+            self._cls_model, {**defaults, **data}
+        )
+
+        if validation_error:
+            raise validation_error
+
         model = await self._collection.find_one_and_update(
             data,
-            {"$setOnInsert": temporal_model.dict(exclude={"id"})},
+            {"$setOnInsert": values},
             upsert=True,
             return_document=True,
         )
