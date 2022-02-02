@@ -451,3 +451,8 @@ async def test_model_get_or_create() -> None:
     ).get_or_create()
     assert movie.name == "Eternals"
     assert movie.year == 2021
+
+    with pytest.raises(pydantic.ValidationError):
+        await movie.query({Movie.name: "Venom 2"}).get_or_create(
+            {Movie.year: "year 2021"}
+        )
