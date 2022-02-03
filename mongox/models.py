@@ -44,6 +44,12 @@ class Q:
         assert not isinstance(args, bool)
         return QueryExpression(key="$or", operator="$or", value=args)
 
+    @classmethod
+    def contains(cls, key: typing.Any, value: typing.Any) -> QueryExpression:
+        if key._pydantic_field.outer_type_ is str:
+            return QueryExpression(key=key, operator="$regex", value=value)
+        return QueryExpression(key=key, operator="$eq", value=value)
+
 
 class QuerySet(typing.Generic[T]):
     def __init__(
