@@ -212,8 +212,8 @@ class QuerySet(typing.Generic[T]):
         }
 
         if field_definitions:
-            pydantic_model: typing.Type[pydantic.BaseModel] = pydantic.create_model(
-                self._cls_model.__name__, **field_definitions  # type: ignore
+            pydantic_model: typing.Type[pydantic.BaseModel] = pydantic.create_model(  # type: ignore # noqa: E501
+                self._cls_model.__name__, **field_definitions
             )
             values, _, validation_error = pydantic.validate_model(
                 pydantic_model, kwargs
