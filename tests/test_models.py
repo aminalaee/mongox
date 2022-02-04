@@ -144,8 +144,8 @@ async def test_model_all() -> None:
     movies = await Movie.query().all()
     assert len(movies) == 1
 
-    movies = Movie.query()
-    async for movie in movies:
+    cursor = Movie.query()
+    async for movie in cursor:
         assert movie.name == "Forrest Gump"
 
 
