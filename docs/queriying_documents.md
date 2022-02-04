@@ -110,8 +110,22 @@ movie = await Movie.query(Movie.name == "Forrest Gump").get()
 movies = await Movie.query().all()
 ```
 
-This will return all matched documents.
+This will return a list of all matched documents.
 It's up to the caller to set the appropriate limits.
+
+You can also use the underlying generator to access queryset results.
+
+```python
+movies = Movie.query()
+
+async for movie in movies:
+    print(movie.name)
+```
+
+Notice that we have ommited `.all()` from the query, so the `await` is not required.
+With `Movie.query()` we create a cursor only and looping through the cursor one item at a time.
+
+This can be useful for scenarios when you don't want to load all documents into memory.
 
 * `count` returns count of documents matching the criteria:
 

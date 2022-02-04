@@ -58,6 +58,15 @@ class QuerySet(typing.Generic[T]):
         self._skip_count = 0
         self._sort: typing.List[SortExpression] = []
 
+    async def __aiter__(self):
+        """Allow iterating overy queryset results."""
+
+        filter_query = QueryExpression.compile_many(self._filter)
+        cursor = self._collection.find(filter_query)
+
+        async for document in cursor:
+            yield self._cls_model(**document)
+
     async def all(self) -> typing.List[T]:
         """Fetch all documents matching the criteria."""
 
@@ -75,14 +84,6 @@ class QuerySet(typing.Generic[T]):
             cursor = cursor.limit(self._limit_count)
 
         return [self._cls_model(**document) async for document in cursor]
-
-    async def __aiter__(self):
-        """Allow iterating overy queryset results."""
-        filter_query = QueryExpression.compile_many(self._filter)
-        cursor = self._collection.find(filter_query)
-
-        async for document in cursor:
-            yield self._cls_model(**document)
 
     async def count(self) -> int:
         """Get count of documents matching the criteria."""
