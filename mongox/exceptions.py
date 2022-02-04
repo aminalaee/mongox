@@ -12,3 +12,7 @@ class MultipleMatchesFound(QueryException):
 
 class InvalidKeyException(QueryException):
     pass
+
+
+class InvalidObjectIdException(QueryException):
+    pass
