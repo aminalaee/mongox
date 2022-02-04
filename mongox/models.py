@@ -16,6 +16,8 @@ __all__ = ["EmbeddedModel", "Model", "Q"]
 
 
 class Q:
+    """Shortcut for creating QueryExpression."""
+
     @classmethod
     def asc(cls, key: typing.Any) -> SortExpression:
         return SortExpression(key, Order.ASCENDING)
@@ -57,9 +59,7 @@ class QuerySet(typing.Generic[T]):
         self._sort: typing.List[SortExpression] = []
 
     async def all(self) -> typing.List[T]:
-        """
-        Fetch all documents matching the criteria
-        """
+        """Fetch all documents matching the criteria."""
 
         filter_query = QueryExpression.compile_many(self._filter)
         cursor = self._collection.find(filter_query)
@@ -76,27 +76,29 @@ class QuerySet(typing.Generic[T]):
 
         return [self._cls_model(**document) async for document in cursor]
 
+    async def __aiter__(self):
+        """Allow iterating overy queryset results."""
+        filter_query = QueryExpression.compile_many(self._filter)
+        cursor = self._collection.find(filter_query)
+
+        async for document in cursor:
+            yield self._cls_model(**document)
+
     async def count(self) -> int:
-        """
-        Get count of documents matching the criteria
-        """
+        """Get count of documents matching the criteria."""
 
         filter_query = QueryExpression.compile_many(self._filter)
         return await self._collection.count_documents(filter_query)
 
     async def delete(self) -> int:
-        """
-        Delete documents matching the criteria
-        """
+        """Delete documents matching the criteria."""
 
         filter_query = QueryExpression.compile_many(self._filter)
         result = await self._collection.delete_many(filter_query)
         return result.deleted_count
 
     async def first(self) -> typing.Optional[T]:
-        """
-        Get first document matching the criteria or None
-        """
+        """Get first document matching the criteria or None."""
 
         objects = await self.limit(1).all()
         if not objects:
@@ -104,9 +106,7 @@ class QuerySet(typing.Generic[T]):
         return objects[0]
 
     async def get(self) -> T:
-        """
-        Get the only document matching or throw exceptions
-        """
+        """Get the only document matching or throw exceptions."""
 
         objects = await self.limit(2).all()
         if len(objects) == 0:
@@ -116,9 +116,7 @@ class QuerySet(typing.Generic[T]):
         return objects[0]
 
     async def get_or_create(self, defaults: typing.Dict = dict()) -> T:
-        """
-        Get the only document matching or create the document
-        """
+        """Get the only document matching or create the document."""
 
         data = {expression.key: expression.value for expression in self._filter}
         defaults = {
@@ -142,9 +140,7 @@ class QuerySet(typing.Generic[T]):
         return self._cls_model(**model)
 
     def limit(self, count: int = 0) -> "QuerySet[T]":
-        """
-        Limit query results
-        """
+        """Limit query results."""
 
         self._limit_count = count
         return self
@@ -152,9 +148,7 @@ class QuerySet(typing.Generic[T]):
     def query(
         self, *args: typing.Union[bool, typing.Dict, QueryExpression]
     ) -> "QuerySet[T]":
-        """
-        Filter query criteria
-        """
+        """Filter query criteria."""
 
         for arg in args:
             assert isinstance(arg, (dict, QueryExpression)), "Invalid argument to Query"
@@ -167,9 +161,7 @@ class QuerySet(typing.Generic[T]):
         return self
 
     def skip(self, count: int = 0) -> "QuerySet[T]":
-        """
-        Skip N number of documents
-        """
+        """Skip N number of documents."""
 
         self._skip_count = count
         return self
@@ -193,9 +185,7 @@ class QuerySet(typing.Generic[T]):
     def sort(
         self, key: typing.Any, direction: typing.Optional[Order] = None
     ) -> "QuerySet[T]":
-        """
-        Sort by (key, direction) or [(key, direction)]
-        """
+        """Sort by (key, direction) or [(key, direction)]."""
 
         direction = direction or Order.ASCENDING
 
@@ -212,9 +202,7 @@ class QuerySet(typing.Generic[T]):
         return self
 
     async def update(self, **kwargs: typing.Any) -> typing.List[T]:
-        """
-        Update the matching criteria with provided info
-        """
+        """Update the matching criteria with provided info."""
 
         field_definitions = {
             name: (annotations, ...)
@@ -329,9 +317,7 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         }
 
     async def insert(self: T) -> T:
-        """
-        Insert the document
-        """
+        """Insert the document."""
 
         data = self.dict(exclude={"id"})
         result = await self.Meta.collection._collection.insert_one(data)
@@ -340,8 +326,7 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
 
     @classmethod
     async def create_index(cls, name: str) -> str:
-        """
-        Create single index from Meta indexes by name.
+        """Create single index from Meta indexes by name.
 
         Can raise `pymongo.errors.OperationFailure`.
         """
@@ -354,24 +339,19 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
 
     @classmethod
     async def create_indexes(cls) -> typing.List[str]:
-        """
-        Create indexes defined for the collection
-        """
+        """Create indexes defined for the collection."""
 
         return await cls.Meta.collection._collection.create_indexes(cls.Meta.indexes)
 
     async def delete(self) -> int:
-        """
-        Delete the current document.
-        """
+        """Delete the current document."""
 
         result = await self.Meta.collection._collection.delete_one({"_id": self.id})
         return result.deleted_count
 
     @classmethod
     async def drop_index(cls, name: str) -> str:
-        """
-        Drop single index from Meta indexes by name.
+        """Drop single index from Meta indexes by name.
 
         Can raise `pymongo.errors.OperationFailure`.
         """
@@ -386,8 +366,8 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
     async def drop_indexes(
         cls, force: bool = False
     ) -> typing.Optional[typing.List[str]]:
-        """
-        Drop all indexes defined for the collection.
+        """Drop all indexes defined for the collection.
+
         With `force=True`, even indexes not defined on the collection will be removed.
 
         Can raise `pymongo.errors.OperationFailure`.
@@ -403,9 +383,7 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
     def query(
         cls: typing.Type[T], *args: typing.Union[bool, typing.Dict, QueryExpression]
     ) -> QuerySet[T]:
-        """
-        Filter query criteria
-        """
+        """Filter query criteria."""
 
         filter_: typing.List[QueryExpression] = []
         if not args:
@@ -422,10 +400,9 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         return QuerySet(cls_model=cls, filter_=filter_)
 
     async def save(self: T) -> T:
-        """
-        Save the document.
+        """Save the document.
 
-        This is equivalent of an update.
+        This is equivalent of a single instance update.
         """
 
         await self.Meta.collection._collection.update_one(
