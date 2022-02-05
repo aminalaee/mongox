@@ -122,7 +122,7 @@ async for movie in movies:
     print(movie.name)
 ```
 
-Notice that we have ommited `.all()` from the query, so the `await` is not required.
+Notice that we have ommited `.all()` from the query, so the `await` is not needed.
 With `Movie.query()` we create a cursor only and looping through the cursor one item at a time.
 
 This can be useful for scenarios when you don't want to load all documents into memory.
