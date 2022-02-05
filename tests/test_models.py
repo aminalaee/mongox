@@ -1,6 +1,7 @@
 import asyncio
 import os
 import typing
+import secrets
 
 import bson
 import pydantic
@@ -8,7 +9,7 @@ import pytest
 from pymongo import errors
 
 from mongox.database import Client
-from mongox.exceptions import MultipleMatchesFound, NoMatchFound
+from mongox.exceptions import MultipleMatchesFound, NoMatchFound, InvalidObjectIdException
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order
 from mongox.models import Model, Q
@@ -460,3 +461,19 @@ async def test_model_get_or_create() -> None:
         await movie.query({Movie.name: "Venom 2"}).get_or_create(
             {Movie.year: "year 2021"}
         )
+
+
+async def test_model_get_by_id() -> None:
+    movie = await Movie(name="Forrest Gump", year=2003).insert()
+
+    a_movie = await Movie.get_by_id(str(movie.id))
+    assert movie.name == a_movie.name
+
+    b_movie = await Movie.get_by_id(movie.id)
+    assert movie.name == b_movie.name
+
+    with pytest.raises(InvalidObjectIdException):
+        await Movie.get_by_id("invalid_id")
+
+    with pytest.raises(NoMatchFound):
+        await Movie.get_by_id(secrets.token_hex(12))

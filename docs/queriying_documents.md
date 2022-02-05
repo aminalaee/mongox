@@ -191,6 +191,12 @@ Here the `Movie` will be queried by name `Forrest Gump` and if not found, it wil
 {"name": "Forrest Gump", "year": 1994}
 ```
 
+* `get_by_id` A shortcut method to get single document by `_id` key:
+
+```python
+movie = await Movie.get_by_id("507f1f77bcf86cd799439011")
+```
+
 * `limit` to limit number of documents returned:
 
 ```python

@@ -5,7 +5,7 @@ import pydantic
 
 from mongox._helpers import normalize_class_name
 from mongox.database import Collection, Database
-from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound
+from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound, InvalidObjectIdException
 from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
 from mongox.index import Index, Order
@@ -412,3 +412,15 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         for k, v in self.dict(exclude={"id"}).items():
             setattr(self, k, v)
         return self
+
+    @classmethod
+    async def get_by_id(cls: typing.Type[T], id: typing.Union[str, bson.ObjectId]) -> T:
+        """Get document by id."""
+
+        if isinstance(id, str):
+            try:
+                id = bson.ObjectId(id)
+            except bson.errors.InvalidId as e:
+                raise InvalidObjectIdException(f'"{id}" is not a valid BSON ObjectId') from e
+
+        return await cls.query({"_id": id}).get()
