@@ -8,9 +8,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 class QueryExpression:
-    """
-    Dataclass holding Query crtieria
-    """
+    """Dataclass holding Query crtieria."""
 
     def __init__(
         self, key: typing.Union[str, "ModelField"], operator: str, value: typing.Any
@@ -21,9 +19,7 @@ class QueryExpression:
 
     @property
     def compiled_value(self) -> typing.Any:
-        """
-        Prepare value for query by trying to cast to a map first.
-        """
+        """Prepare value for query by trying to cast to a map first."""
 
         if isinstance(self.value, list):
             return [self._map(v) for v in self.value]
@@ -31,18 +27,14 @@ class QueryExpression:
             return self._map(self.value)
 
     def _map(self, v: typing.Any) -> typing.Any:
-        """
-        Map to a dictionary if the value supports a mapping interface
-        """
+        """Map to a dictionary if the value supports a mapping interface."""
         try:
             return v.dict()
         except AttributeError:
             return v
 
     def compile(self) -> typing.Dict[str, typing.Dict[str, typing.Any]]:
-        """
-        Compile QueryExpression to a Dict as MongoDB expects.
-        """
+        """Compile QueryExpression to a Dict as MongoDB expects."""
         return {self.key: {self.operator: self.compiled_value}}
 
     @classmethod
@@ -70,8 +62,7 @@ class QueryExpression:
 
     @classmethod
     def unpack(self, d: typing.Dict[str, typing.Any]) -> "typing.List[QueryExpression]":
-        """
-        Unpack dictionary to a list of QueryExpression.
+        """Unpack dictionary to a list of QueryExpression.
 
         For now works only for the following queries:
             d = {"name": "value"}
@@ -94,17 +85,13 @@ class QueryExpression:
 
 
 class SortExpression:
-    """
-    Dataclass holding Sort criteria
-    """
+    """Dataclass holding Sort criteria"""
 
     def __init__(self, key: typing.Union[str, "ModelField"], direction: Order) -> None:
         self.key = key if isinstance(key, str) else key._name
         self.direction = direction
 
     def compile(self) -> typing.Tuple[str, Order]:
-        """
-        compile SortExpression to a Tuple[str, direction] as MongoDB expects.
-        """
+        """compile SortExpression to a Tuple[str, direction] as MongoDB expects."""
 
         return (self.key, self.direction)

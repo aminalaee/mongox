@@ -15,9 +15,7 @@ __all__ = ["Field", "ObjectId"]
 
 
 class ObjectId(bson.ObjectId):
-    """
-    Pydantic ObjectId field with validators
-    """
+    """Pydantic ObjectId field with validators."""
 
     @classmethod
     def __get_validators__(cls) -> typing.Generator[bson.ObjectId, None, None]:
@@ -35,9 +33,7 @@ class ObjectId(bson.ObjectId):
 
 
 class ModelField:
-    """
-    Custom ModelField to create query building
-    """
+    """Custom ModelField to create query building."""
 
     def __init__(
         self,
@@ -78,9 +74,7 @@ class ModelField:
         return super().__hash__()
 
     def __getattr__(self, name: str) -> typing.Any:
-        """
-        Overriding attr to assign parent for reverse lookup
-        """
+        """Overriding attr to assign parent for reverse lookup."""
         assert self._model_cls is not None
 
         if name not in self._model_cls.__mongox_fields__:

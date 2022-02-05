@@ -17,9 +17,7 @@ class IndexType(str, enum.Enum):
 
 
 class Index(pymongo.IndexModel):
-    """
-    MongoDB Index
-    """
+    """MongoDB Index"""
 
     def __init__(
         self,
