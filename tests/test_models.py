@@ -145,6 +145,10 @@ async def test_model_all() -> None:
     movies = await Movie.query().all()
     assert len(movies) == 1
 
+    cursor = Movie.query()
+    async for movie in cursor:
+        assert movie.name == "Forrest Gump"
+
 
 async def test_model_sort() -> None:
     await Movie(name="Forrest Gump", year=2003).insert()
