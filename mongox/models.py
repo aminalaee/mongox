@@ -5,7 +5,12 @@ import pydantic
 
 from mongox._helpers import normalize_class_name
 from mongox.database import Collection, Database
-from mongox.exceptions import InvalidKeyException, MultipleMatchesFound, NoMatchFound, InvalidObjectIdException
+from mongox.exceptions import (
+    InvalidKeyException,
+    InvalidObjectIdException,
+    MultipleMatchesFound,
+    NoMatchFound,
+)
 from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
 from mongox.index import Index, Order
@@ -427,6 +432,8 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
             try:
                 id = bson.ObjectId(id)
             except bson.errors.InvalidId as e:
-                raise InvalidObjectIdException(f'"{id}" is not a valid BSON ObjectId') from e
+                raise InvalidObjectIdException(
+                    f'"{id}" is not a valid BSON ObjectId'
+                ) from e
 
         return await cls.query({"_id": id}).get()

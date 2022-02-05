@@ -1,7 +1,7 @@
 import asyncio
 import os
-import typing
 import secrets
+import typing
 
 import bson
 import pydantic
@@ -9,7 +9,11 @@ import pytest
 from pymongo import errors
 
 from mongox.database import Client
-from mongox.exceptions import MultipleMatchesFound, NoMatchFound, InvalidObjectIdException
+from mongox.exceptions import (
+    InvalidObjectIdException,
+    MultipleMatchesFound,
+    NoMatchFound,
+)
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order
 from mongox.models import Model, Q
@@ -390,7 +394,9 @@ async def test_raw_queries() -> None:
 
 
 async def test_custom_query_operators() -> None:
-    await Movie(name="The Two Towers", year=2002, tags=["Fantasy", "Adventure"]).insert()
+    await Movie(
+        name="The Two Towers", year=2002, tags=["Fantasy", "Adventure"]
+    ).insert()
     await Movie(name="Downfall", year=2004, tags=["Drama"]).insert()
     await Movie(name="Boyhood", year=2010, tags=["Coming Of Age", "Drama"]).insert()
 
