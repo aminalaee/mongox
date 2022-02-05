@@ -368,12 +368,18 @@ This will match movies with name `Forrest Gump` or movies with year greater than
 movies = await Movie.query(Q.or_(Movie.name == "Forrest Gump", Movie.year > 2000)).all()
 ```
 
-* `Q.contains()` Querying inside list.
+* `Q.contains()` Querying inside lists nad strings.
  
  This will query for movie with tag `Drama`.
 
  ```python
- movies = await Movie.query(Q.contains(Movie.tag, "Drama")).all()
+ movies = await Movie.query(Q.contains(Movie.tags, "Drama")).all()
+ ```
+
+ This will query for movie which in the name contains  `Forrest`.
+
+ ```python
+ movies = await Movie.query(Q.contains(Movie.name, "Forrest")).all()
  ```
 
 ### Embedded Models
