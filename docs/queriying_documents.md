@@ -376,7 +376,7 @@ movies = await Movie.query(Q.or_(Movie.name == "Forrest Gump", Movie.year > 2000
  movies = await Movie.query(Q.contains(Movie.tags, "Drama")).all()
  ```
 
- This will query for movie which in the name contains  `Forrest`.
+ This will query for movie which in the name contains `Forrest`.
 
  ```python
  movies = await Movie.query(Q.contains(Movie.name, "Forrest")).all()
