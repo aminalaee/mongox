@@ -415,9 +415,7 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
 
     @classmethod
     async def get_by_id(cls: typing.Type[T], id: typing.Union[str, bson.ObjectId]) -> T:
-        """
-        Get document by id
-        """
+        """Get document by id."""
 
         if isinstance(id, str):
             try:
@@ -425,5 +423,4 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
             except bson.errors.InvalidId as e:
                 raise InvalidObjectIdException(f'"{id}" is not a valid BSON ObjectId') from e
 
-        result = await cls.query({"_id": id}).get()
-        return result
+        return await cls.query({"_id": id}).get()
