@@ -1,7 +1,7 @@
 import asyncio
 import os
-import typing
 import secrets
+import typing
 
 import bson
 import pydantic
@@ -9,7 +9,11 @@ import pytest
 from pymongo import errors
 
 from mongox.database import Client
-from mongox.exceptions import MultipleMatchesFound, NoMatchFound, InvalidObjectIdException
+from mongox.exceptions import (
+    InvalidObjectIdException,
+    MultipleMatchesFound,
+    NoMatchFound,
+)
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order
 from mongox.models import Model, Q
@@ -30,6 +34,7 @@ indexes = [
 class Movie(Model, db=db, indexes=indexes):
     name: str
     year: int
+    tags: typing.Optional[typing.List[str]]
     uuid: typing.Optional[ObjectId]
 
 
@@ -56,7 +61,7 @@ def test_model_class() -> None:
     assert (
         movie.dict()
         == dict(movie)
-        == {"name": "Batman", "year": 2009, "id": None, "uuid": None}
+        == {"name": "Batman", "year": 2009, "id": None, "uuid": None, "tags": None}
     )
 
     assert Movie.Meta.database == db
@@ -69,6 +74,7 @@ def test_model_class() -> None:
             "_id": {"title": " Id", "type": "string"},
             "name": {"title": "Name", "type": "string"},
             "year": {"title": "Year", "type": "integer"},
+            "tags": {"items": {"type": "string"}, "title": "Tags", "type": "array"},
             "uuid": {"title": "Uuid", "type": "string"},
         },
         "required": ["name", "year"],
@@ -388,9 +394,11 @@ async def test_raw_queries() -> None:
 
 
 async def test_custom_query_operators() -> None:
-    await Movie(name="The Two Towers", year=2002).insert()
-    await Movie(name="Downfall", year=2004).insert()
-    await Movie(name="Boyhood", year=2010).insert()
+    await Movie(
+        name="The Two Towers", year=2002, tags=["Fantasy", "Adventure"]
+    ).insert()
+    await Movie(name="Downfall", year=2004, tags=["Drama"]).insert()
+    await Movie(name="Boyhood", year=2010, tags=["Coming Of Age", "Drama"]).insert()
 
     movies = await Movie.query(Q.in_(Movie.year, [2000, 2001, 2002])).all()
 
@@ -432,6 +440,13 @@ async def test_custom_query_operators() -> None:
         .count()
     )
     assert count == 0
+
+    movies = await Movie.query(Q.contains(Movie.tags, "Drama")).all()
+    assert movies[0].name == "Downfall"
+    assert movies[1].name == "Boyhood"
+
+    movies = await Movie.query(Q.contains(Movie.name, "Two")).all()
+    assert movies[0].name == "The Two Towers"
 
 
 async def test_model_get_or_create() -> None:

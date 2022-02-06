@@ -1,12 +1,14 @@
 Let's say we have defined the following documents:
 
 ```python
+import typing
 import mongox
 
 
 class Movie(mongox.Model):
     name: str
     year: int
+    tags: typing.List[str]
 ```
 
 ### Inserting documents
@@ -16,20 +18,20 @@ In order to work with documents we'll first need to insert some.
 MongoX provides an `insert` method to the document instances.
 
 ```python
-movie = await Movie(name="Forrest Gump", year=1994).insert()
+movie = await Movie(name="Forrest Gump", year=1994, tags=["Comedy", "Drama"]).insert()
 ```
 
 Of course we can also do it in two steps:
 
 ```python
-movie = Movie(name="Forrest Gump", year=1994)
+movie = Movie(name="Forrest Gump", year=1994, tags=["Comedy", "Drama"])
 movie = await movie.insert()
 ```
 
 This will insert the following document in MongoDB:
 
 ```json
-{"name": "Forrest Gump", "year": 1994}
+{"name": "Forrest Gump", "year": 1994, "tags": ["Comedy", "Drama"]}
 ```
 
 The great thing about MongoX is that since it's fully type annotated,
@@ -171,7 +173,11 @@ movies = (
 
 ```python
 movie = (
-    await Movie.query(Movie.name == "Forrest Gump", Movie.year == 1994)
+    await Movie.query(
+        Movie.name == "Forrest Gump",
+        Movie.year == 1994,
+        Movie.tags == ["Comedy", "Drama"]
+    )
     .get_or_create()
 )
 ```
@@ -181,14 +187,14 @@ The method has the ability to receive some other fields to be used for creation 
 ```python
 movie = (
     await Movie.query(Movie.name == "Forrest Gump")
-    .get_or_create({Movie.year: 1994})
+    .get_or_create({Movie.year: 1994, Movie.tags: ["Comedy", "Drama"]})
 )
 ```
 
 Here the `Movie` will be queried by name `Forrest Gump` and if not found, it will be created with:
 
 ```json
-{"name": "Forrest Gump", "year": 1994}
+{"name": "Forrest Gump", "year": 1994, "tags": ["Comedy", "Drama"]}
 ```
 
 * `get_by_id` A shortcut method to get single document by `_id` key:
@@ -361,6 +367,20 @@ This will match movies with name `Forrest Gump` or movies with year greater than
 ```python
 movies = await Movie.query(Q.or_(Movie.name == "Forrest Gump", Movie.year > 2000)).all()
 ```
+
+* `Q.contains()` Querying inside lists nad strings.
+ 
+ This will query for movie with tag `Drama`.
+
+ ```python
+ movies = await Movie.query(Q.contains(Movie.tags, "Drama")).all()
+ ```
+
+ This will query for movie which in the name contains `Forrest`.
+
+ ```python
+ movies = await Movie.query(Q.contains(Movie.name, "Forrest")).all()
+ ```
 
 ### Embedded Models
 
