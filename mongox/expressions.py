@@ -8,7 +8,7 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 
 
 class QueryExpression:
-    """Dataclass holding Query crtieria."""
+    """Dataclass holding Query criteria."""
 
     def __init__(
         self, key: typing.Union[str, "ModelField"], operator: str, value: typing.Any
@@ -61,7 +61,7 @@ class QueryExpression:
         return {**compiled_dicts, **compiled_lists}
 
     @classmethod
-    def unpack(self, d: typing.Dict[str, typing.Any]) -> "typing.List[QueryExpression]":
+    def unpack(cls, d: typing.Dict[str, typing.Any]) -> "typing.List[QueryExpression]":
         """Unpack dictionary to a list of QueryExpression.
 
         For now works only for the following queries:
@@ -94,4 +94,4 @@ class SortExpression:
     def compile(self) -> typing.Tuple[str, Order]:
         """compile SortExpression to a Tuple[str, direction] as MongoDB expects."""
 
-        return (self.key, self.direction)
+        return self.key, self.direction

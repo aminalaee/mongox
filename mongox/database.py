@@ -9,7 +9,7 @@ from motor.motor_asyncio import (
 
 
 class Collection:
-    """MongoDB Collection with a referrence to the Motor Collection."""
+    """MongoDB Collection with a reference to the Motor Collection."""
 
     def __init__(self, collection: AsyncIOMotorCollection, name: str) -> None:
         self._collection = collection
@@ -17,7 +17,7 @@ class Collection:
 
 
 class Database:
-    """MongoDB Database with a referrence to the Motor database."""
+    """MongoDB Database with a reference to the Motor database."""
 
     def __init__(self, db: AsyncIOMotorDatabase, name: str) -> None:
         self._db = db
@@ -33,7 +33,7 @@ class Database:
 
 
 class Client:
-    """MongoDB Client class with a referrence to the Motor client."""
+    """MongoDB Client class with a reference to the Motor client."""
 
     def __init__(
         self,

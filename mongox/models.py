@@ -59,7 +59,7 @@ class QuerySet(typing.Generic[T]):
         self._sort: typing.List[SortExpression] = []
 
     async def __aiter__(self) -> typing.AsyncGenerator[T, None]:
-        """Allow iterating overy queryset results."""
+        """Allow iterating over queryset results."""
 
         filter_query = QueryExpression.compile_many(self._filter)
         cursor = self._collection.find(filter_query)
