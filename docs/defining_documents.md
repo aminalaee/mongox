@@ -38,9 +38,6 @@ is both a mongox `Model` and also a pydantic `BaseModel`.
 
 Now we have a `Movie` collection with attributes `name` and `year`.
 
-!!! note
-    The `Meta` class is required since we need to know which collection this belongs to.
-
 ### Field validation
 
 You can add field-level validations by using `mongox.Field`.
@@ -96,7 +93,7 @@ the Pydantic docs [here](https://pydantic-docs.helpmanual.io/usage/schema/#field
 
 ### Defining indexes
 
-Index definition should be inside the `Meta` class of the Model.
+Mongox models accept `indexes` as a list of `mongox.Index` instances:
 
 ```python
 import mongox
@@ -113,8 +110,6 @@ class Movie(mongox.Model, db=db, indexes=indexes):
     genre: str
     year: int 
 ```
-
-As you can see `Meta` class expects `indexes` to be a list of `Index` objects.
 
 For creating `Index` objects we have two options, for simple cases we can do:
 
@@ -140,7 +135,8 @@ Or to drop the indexes:
 await Movie.drop_indexes()
 ```
 
-Note that this will only drop indexes defined in `Meta` class.
+Note that this will only drop indexes defined in `Movie` model and
+won't affect the ones manually created.
 To drop all indexes, even those not defined here you can pass `force=True`:
 
 ```python
