@@ -1,4 +1,5 @@
 import typing
+import re
 
 import bson
 import pydantic
@@ -10,6 +11,7 @@ from mongox.exceptions import (
     InvalidObjectIdException,
     MultipleMatchesFound,
     NoMatchFound,
+    InvalidFieldTypeException,
 )
 from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
@@ -54,6 +56,14 @@ class Q:
         if key._pydantic_field.outer_type_ is str:
             return QueryExpression(key=key, operator="$regex", value=value)
         return QueryExpression(key=key, operator="$eq", value=value)
+
+    @classmethod
+    def regex(cls, key: typing.Any, value: typing.Union[str, re.Pattern]) -> QueryExpression:
+        if key._pydantic_field.outer_type_ is str:
+            expression = value.pattern if isinstance(value, re.Pattern) else value
+            return QueryExpression(key=key, operator="$regex", value=expression)
+        name = key if isinstance(key, str) else key._name
+        raise InvalidFieldTypeException(f"The {name} field is not of type str")
 
 
 class QuerySet(typing.Generic[T]):
