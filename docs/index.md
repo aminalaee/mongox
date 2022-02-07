@@ -82,9 +82,7 @@ movie = await Movie(name="Forrest Gump", year=1994).insert()
 
 The returned result will be a `Movie` instance, and `mypy`
 will understand that this is a `Movie` instance.
-So you will have type hints and validations everywhere:
-
-<img alt="MongoX insert screenshot" src="https://user-images.githubusercontent.com/19784933/141309006-94785d1b-c0de-4fde-8b7d-f59253657d64.png">
+So you will have type hints and validations everywhere.
 
 Now you can fetch some data from the database.
 
@@ -98,9 +96,6 @@ The returned result will be a `Movie` instance, and `mypy`
 will understand that this is a `Movie` instance.
 
 This will have great IDE support, autocompletion and validation.
-
-<img alt="MongoX get screenshot" src="https://user-images.githubusercontent.com/19784933/141615279-f4534246-e09d-4d5e-90f6-32f0a3807769.png">
-
 
 Or you can use `Movie` fields instead of dictionaries in the query (less room for bugs):
 

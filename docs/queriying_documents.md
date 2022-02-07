@@ -42,9 +42,6 @@ to know which fields are required.
 
 And you will also know that the result of `insert` will be a `Movie` instance.
 
-<img alt="MongoX insert screenshot" src="https://user-images.githubusercontent.com/19784933/141309006-94785d1b-c0de-4fde-8b7d-f59253657d64.png">
-
-
 This will lead to more productivity and fewer runtime errors.
 
 Let's say you try to access `genre` of movie:
@@ -82,8 +79,6 @@ movie = await Movie.query(Movie.name == "Forrest Gump").get()
 
 Here you will again have graet IDE and MyPy support,
 as they will know the returned type of `get` will be a `Movie`.
-
-<img alt="MongoX insert screenshot" src="https://user-images.githubusercontent.com/19784933/141309006-94785d1b-c0de-4fde-8b7d-f59253657d64.png">
 
 So you can access `movie` attributes safely.
 
