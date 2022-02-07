@@ -92,11 +92,6 @@ You can use the same pattern as PyMongo/Motor:
 movie = await Movie.query({"name": "Forrest Gump"}).get()
 ```
 
-The returned result will be a `Movie` instance, and `mypy`
-will understand that this is a `Movie` instance.
-
-This will have great IDE support, autocompletion and validation.
-
 Or you can use `Movie` fields instead of dictionaries in the query (less room for bugs):
 
 ```python
