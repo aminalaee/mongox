@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 import secrets
 import typing
 
@@ -13,6 +14,7 @@ from mongox.exceptions import (
     InvalidObjectIdException,
     MultipleMatchesFound,
     NoMatchFound,
+    InvalidFieldTypeException,
 )
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order
@@ -447,6 +449,20 @@ async def test_custom_query_operators() -> None:
 
     movies = await Movie.query(Q.contains(Movie.name, "Two")).all()
     assert movies[0].name == "The Two Towers"
+
+    movies = await Movie.query(Q.regex(Movie.name, r"\w+ Two \w+")).all()
+    assert len(movies) == 1
+    assert movies[0].name == "The Two Towers"
+
+    movies = await Movie.query(Q.regex(Movie.name, re.compile(r"\w+ Two \w+"))).all()
+    assert len(movies) == 1
+    assert movies[0].name == "The Two Towers"
+
+    movies = await Movie.query(Q.regex(Movie.name, r"\w+ The \w+")).all()
+    assert len(movies) == 0
+
+    with pytest.raises(InvalidFieldTypeException):
+        await Movie.query(Q.regex(Movie.year, r"\w+ The \w+")).all()
 
 
 async def test_model_get_or_create() -> None:
