@@ -11,10 +11,10 @@ from pymongo import errors
 
 from mongox.database import Client
 from mongox.exceptions import (
+    InvalidFieldTypeException,
     InvalidObjectIdException,
     MultipleMatchesFound,
     NoMatchFound,
-    InvalidFieldTypeException,
 )
 from mongox.fields import ObjectId
 from mongox.index import Index, IndexType, Order

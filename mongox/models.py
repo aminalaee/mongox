@@ -1,5 +1,5 @@
-import typing
 import re
+import typing
 
 import bson
 import pydantic
@@ -7,11 +7,11 @@ import pydantic
 from mongox._helpers import normalize_class_name
 from mongox.database import Collection, Database
 from mongox.exceptions import (
+    InvalidFieldTypeException,
     InvalidKeyException,
     InvalidObjectIdException,
     MultipleMatchesFound,
     NoMatchFound,
-    InvalidFieldTypeException,
 )
 from mongox.expressions import QueryExpression, SortExpression
 from mongox.fields import ModelField, ObjectId
@@ -58,7 +58,9 @@ class Q:
         return QueryExpression(key=key, operator="$eq", value=value)
 
     @classmethod
-    def regex(cls, key: typing.Any, value: typing.Union[str, re.Pattern]) -> QueryExpression:
+    def regex(
+        cls, key: typing.Any, value: typing.Union[str, re.Pattern]
+    ) -> QueryExpression:
         if key._pydantic_field.outer_type_ is str:
             expression = value.pattern if isinstance(value, re.Pattern) else value
             return QueryExpression(key=key, operator="$regex", value=expression)
