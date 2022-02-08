@@ -365,19 +365,19 @@ movies = await Movie.query(Q.or_(Movie.name == "Forrest Gump", Movie.year > 2000
 
 * `Q.contains()` Querying inside lists nad strings.
  
-This will query for movie with tag `Drama`.
+This will query for movies with tag `Drama`.
 
 ```python
 movies = await Movie.query(Q.contains(Movie.tags, "Drama")).all()
 ```
 
-This will query for movie which in the name contains `Forrest`.
+This will query for movies which in the name contains `Forrest`.
 
 ```python
 movies = await Movie.query(Q.contains(Movie.name, "Forrest")).all()
 ```
 
-This will query for movie which the name matches `\w+ Two \w+`.
+This will query for movies which the name matches `\w+ Two \w+`.
 
 ```python
 movies = await Movie.query(Q.regex(Movie.name, r"\w+ The \w+")).all()
