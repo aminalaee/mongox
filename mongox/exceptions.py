@@ -16,3 +16,7 @@ class InvalidKeyException(QueryException):
 
 class InvalidObjectIdException(QueryException):
     pass
+
+
+class InvalidFieldTypeException(QueryException):
+    pass
