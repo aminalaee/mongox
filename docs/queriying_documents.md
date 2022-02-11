@@ -34,6 +34,15 @@ This will insert the following document in MongoDB:
 {"name": "Forrest Gump", "year": 1994, "tags": ["Comedy", "Drama"]}
 ```
 
+If you want to insert many documents at once, just use `insert_many` method:
+```python
+movies = [
+    Movie(name="Forrest Gump", year=1994, tags=["Comedy", "Drama"]),
+    Movie(name="The Shawshank Redemption", year=1994, tags=["Drama"]),
+]
+movies = await Movie.insert_many(movies)
+```
+
 The great thing about MongoX is that since it's fully type annotated,
 you will have great `mypy` and IDE support.
 
