@@ -161,7 +161,7 @@ class Movie(mongox.Model, db=db, collection="movies"):
 
 ### Indexes
 
-`Model.create_index()`: Creates a single index defined in `Meta` class.
+`Model.create_index()`: Creates a single index defined in `Model` class.
 
 ??? example
     ```python
@@ -169,9 +169,9 @@ class Movie(mongox.Model, db=db, collection="movies"):
     ```
 
 ??? warning
-    This can raise `mongox.InvalidKeyException` if index is not found in `Meta` class.
+    This can raise `mongox.InvalidKeyException` if index is not found in `Model` class.
 
-`Model.create_indexes()`: Creates indexes defined in `Meta` class.
+`Model.create_indexes()`: Creates indexes defined in `Model` class.
 
 ??? example
     ```python
@@ -186,7 +186,7 @@ class Movie(mongox.Model, db=db, collection="movies"):
 
 ??? example
     ```python
-    # Drops indexes defined in Meta class.
+    # Drops indexes defined in Movie class.
     await Movie.drop_indexes()
     ```
 
@@ -207,4 +207,4 @@ class Movie(mongox.Model, db=db, collection="movies"):
     ```
 
 ??? warning
-    This can raise `mongox.InvalidKeyException` if index is not found in `Meta` class.
+    This can raise `mongox.InvalidKeyException` if index is not found in `Model` class.
