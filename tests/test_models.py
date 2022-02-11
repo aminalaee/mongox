@@ -495,36 +495,9 @@ async def test_model_get_by_id() -> None:
         await Movie.get_by_id(secrets.token_hex(12))
 
 
-async def test_model_insert_one() -> None:
-    movie = Movie(name="The Godfather", year=1972)
-    movie_db = await Movie.insert_one(movie)
-    assert movie_db.name == "The Godfather"
-    assert movie_db.year == 1972
-    assert isinstance(movie.id, bson.ObjectId)
-
-    with pytest.raises(pydantic.error_wrappers.ValidationError) as exc:
-        movie = Movie(name="Avengers", year=2017, uuid="1")
-        await Movie.insert_one(movie)  # type: ignore
-    assert exc.value.errors() == [
-        {"loc": ("uuid",), "msg": "Invalid ObjectId", "type": "value_error"}
-    ]
-
-    with pytest.raises(errors.DuplicateKeyError):
-        movie = Movie(name="The Godfather", year=1972)
-        await Movie.insert_one(movie)
-
-    class Book(Model, db=db, indexes=indexes):
-        name: str
-        year: int
-
-    with pytest.raises(TypeError):
-        book = Book(name="The Book", year=1972)
-        await Movie.insert_one(book)  # type: ignore
-
-
 async def test_model_insert_many() -> None:
     movies = []
-    movie_names = ["The Dark Knight", "The Dark Knight Rises", "The Godfather"]
+    movie_names = ("The Dark Knight", "The Dark Knight Rises", "The Godfather")
     for movie_name in movie_names:
         movies.append(Movie(name=movie_name, year=random.randint(1970, 2020)))
     movies_db = await Movie.insert_many(movies)

@@ -337,18 +337,12 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         return self
 
     @classmethod
-    async def insert_one(cls: typing.Type[T], model: T) -> T:
-        if not isinstance(model, cls):
-            raise TypeError(f"Model must be of type {cls.__name__}")
-        return await model.insert()
-
-    @classmethod
     async def insert_many(cls: typing.Type[T], models: typing.List[T]) -> typing.List[T]:
         if not all(isinstance(model, cls) for model in models):
             raise TypeError(f"All models must be of type {cls.__name__}")
 
-        datas = (model.dict(exclude={"id"}) for model in models)
-        results = await cls.Meta.collection._collection.insert_many(datas)
+        data = (model.dict(exclude={"id"}) for model in models)
+        results = await cls.Meta.collection._collection.insert_many(data)
         for model, inserted_id in zip(models, results.inserted_ids):
             model.id = inserted_id
         return models
