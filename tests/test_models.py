@@ -3,6 +3,7 @@ import os
 import re
 import secrets
 import typing
+import random
 
 import bson
 import pydantic
@@ -508,3 +509,24 @@ async def test_model_get_by_id() -> None:
 
     with pytest.raises(NoMatchFound):
         await Movie.get_by_id(secrets.token_hex(12))
+
+
+async def test_model_insert_many() -> None:
+    movies = []
+    movie_names = ("The Dark Knight", "The Dark Knight Rises", "The Godfather")
+    for movie_name in movie_names:
+        movies.append(Movie(name=movie_name, year=random.randint(1970, 2020)))
+    movies_db = await Movie.insert_many(movies)
+    for movie, movie_db in zip(movies, movies_db):
+        assert movie.name == movie_db.name
+        assert movie.year == movie_db.year
+        assert isinstance(movie.id, bson.ObjectId)
+
+    class Book(Model, db=db, indexes=indexes):
+        name: str
+        year: int
+
+    with pytest.raises(TypeError):
+        book = Book(name="The Book", year=1972)
+        movie = Movie(name="Inception", year=2010)
+        await Movie.insert_many([book, movie])  # type: ignore

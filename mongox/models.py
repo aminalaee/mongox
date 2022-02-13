@@ -349,6 +349,17 @@ class Model(pydantic.BaseModel, metaclass=ModelMetaClass):
         return self
 
     @classmethod
+    async def insert_many(cls: typing.Type[T], models: typing.List[T]) -> typing.List[T]:
+        if not all(isinstance(model, cls) for model in models):
+            raise TypeError(f"All models must be of type {cls.__name__}")
+
+        data = (model.dict(exclude={"id"}) for model in models)
+        results = await cls.Meta.collection._collection.insert_many(data)
+        for model, inserted_id in zip(models, results.inserted_ids):
+            model.id = inserted_id
+        return models
+
+    @classmethod
     async def create_index(cls, name: str) -> str:
         """Create single index from Meta indexes by name.
 
