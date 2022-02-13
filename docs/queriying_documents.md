@@ -13,7 +13,7 @@ class Movie(mongox.Model):
 
 ### Inserting documents
 
-#### Single documents
+#### Single insert
 
 In order to work with documents we'll first need to insert some.
 
@@ -36,7 +36,7 @@ This will insert the following document in MongoDB:
 {"name": "Forrest Gump", "year": 1994, "tags": ["Comedy", "Drama"]}
 ```
 
-#### Bulk documents
+#### Bulk insert
 
 If you want to insert many documents at once, just use `insert_many` method:
 
