@@ -13,6 +13,8 @@ class Movie(mongox.Model):
 
 ### Inserting documents
 
+#### Single documents
+
 In order to work with documents we'll first need to insert some.
 
 MongoX provides an `insert` method to the document instances.
@@ -34,7 +36,10 @@ This will insert the following document in MongoDB:
 {"name": "Forrest Gump", "year": 1994, "tags": ["Comedy", "Drama"]}
 ```
 
+#### Bulk documents
+
 If you want to insert many documents at once, just use `insert_many` method:
+
 ```python
 movies = [
     Movie(name="Forrest Gump", year=1994, tags=["Comedy", "Drama"]),
