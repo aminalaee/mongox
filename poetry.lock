@@ -597,7 +597,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "starlette"
-version = "0.17.1"
+version = "0.18.0"
 description = "The little ASGI library that shines."
 category = "dev"
 optional = false
@@ -610,7 +610,7 @@ jinja2 = {version = "*", optional = true, markers = "extra == \"full\""}
 python-multipart = {version = "*", optional = true, markers = "extra == \"full\""}
 pyyaml = {version = "*", optional = true, markers = "extra == \"full\""}
 requests = {version = "*", optional = true, markers = "extra == \"full\""}
-typing-extensions = {version = "*", markers = "python_version < \"3.8\""}
+typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
 
 [package.extras]
 full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
@@ -686,7 +686,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "c2bcaa89412e02004a5e86f762e4570aaaa51bd919a10c889b633d2b37b853a6"
+content-hash = "8ac98d28d67811ab2e34a457d8ce9149a7af9b9fcf19d297bc0a0126ca1e8640"
 
 [metadata.files]
 anyio = [
@@ -1201,8 +1201,8 @@ sniffio = [
     {file = "sniffio-1.2.0.tar.gz", hash = "sha256:c4666eecec1d3f50960c6bdf61ab7bc350648da6c126e3cf6898d8cd4ddcd3de"},
 ]
 starlette = [
-    {file = "starlette-0.17.1-py3-none-any.whl", hash = "sha256:26a18cbda5e6b651c964c12c88b36d9898481cd428ed6e063f5f29c418f73050"},
-    {file = "starlette-0.17.1.tar.gz", hash = "sha256:57eab3cc975a28af62f6faec94d355a410634940f10b30d68d31cb5ec1b44ae8"},
+    {file = "starlette-0.18.0-py3-none-any.whl", hash = "sha256:377d64737a0e03560cb8eaa57604afee143cea5a4996933242798a7820e64f53"},
+    {file = "starlette-0.18.0.tar.gz", hash = "sha256:b45c6e9a617ecb5caf7e6446bd8d767b0084d6217e8e1b08187ca5191e10f097"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
