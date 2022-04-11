@@ -598,20 +598,20 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "starlette"
-version = "0.18.0"
+version = "0.19.0"
 description = "The little ASGI library that shines."
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-anyio = ">=3.0.0,<4"
+anyio = ">=3.4.0,<5"
 itsdangerous = {version = "*", optional = true, markers = "extra == \"full\""}
 jinja2 = {version = "*", optional = true, markers = "extra == \"full\""}
 python-multipart = {version = "*", optional = true, markers = "extra == \"full\""}
 pyyaml = {version = "*", optional = true, markers = "extra == \"full\""}
 requests = {version = "*", optional = true, markers = "extra == \"full\""}
-typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
+typing-extensions = {version = ">=3.10.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 full = ["itsdangerous", "jinja2", "python-multipart", "pyyaml", "requests"]
@@ -679,7 +679,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "2133853f9bd556067e0d0c0c2e4d7cb9aba1e7141ecee1221f22ecb7040c0133"
+content-hash = "9078427db5a1b96e31d3bc7422a7c8211a7c2c65af4dee952dfb2f87e6d9b84a"
 
 [metadata.files]
 anyio = [
@@ -1195,8 +1195,8 @@ sniffio = [
     {file = "sniffio-1.2.0.tar.gz", hash = "sha256:c4666eecec1d3f50960c6bdf61ab7bc350648da6c126e3cf6898d8cd4ddcd3de"},
 ]
 starlette = [
-    {file = "starlette-0.18.0-py3-none-any.whl", hash = "sha256:377d64737a0e03560cb8eaa57604afee143cea5a4996933242798a7820e64f53"},
-    {file = "starlette-0.18.0.tar.gz", hash = "sha256:b45c6e9a617ecb5caf7e6446bd8d767b0084d6217e8e1b08187ca5191e10f097"},
+    {file = "starlette-0.19.0-py3-none-any.whl", hash = "sha256:de752c8f6c2ac6ef78bfe44058fc61dc04895eba24d4e47d2ae254ba5c125c5e"},
+    {file = "starlette-0.19.0.tar.gz", hash = "sha256:4a1a92aa89dbacc3a4c694a2c112863e88449730ff99b421a9b71fb2213bcd9c"},
 ]
 tomli = [
     {file = "tomli-1.2.3-py3-none-any.whl", hash = "sha256:e3069e4be3ead9668e21cb9b074cd948f7b3113fd9c8bba083f48247aab8b11c"},
