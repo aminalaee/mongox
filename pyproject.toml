@@ -47,7 +47,7 @@ autoflake = "^1.4"
 pytest-asyncio = "^0.18.3"
 mkdocs-material = "^8.2.7"
 mkautodoc = "^0.1.0"
-starlette = {extras = ["full"], version = "^0.19.0"}
+starlette = {extras = ["full"], version = "^0.20.1"}
 
 [tool.isort]
 profile = "black"
