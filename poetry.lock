@@ -599,7 +599,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "starlette"
-version = "0.20.1"
+version = "0.20.4"
 description = "The little ASGI library that shines."
 category = "dev"
 optional = false
@@ -680,7 +680,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "af2a66768c4abccea5f6597b7dea9e30901289ace5e1e2678c611cc0f53a64ac"
+content-hash = "491bcee6ef505a0e0c8b662b325669c73a94ed28e682b5da491c4fd148121738"
 
 [metadata.files]
 anyio = [
@@ -1199,8 +1199,8 @@ sniffio = [
     {file = "sniffio-1.2.0.tar.gz", hash = "sha256:c4666eecec1d3f50960c6bdf61ab7bc350648da6c126e3cf6898d8cd4ddcd3de"},
 ]
 starlette = [
-    {file = "starlette-0.20.1-py3-none-any.whl", hash = "sha256:4fe6f005ac9cd973ca885c3679c8d991fde7d2ea4f27b2318b79a6673c3b70af"},
-    {file = "starlette-0.20.1.tar.gz", hash = "sha256:dd8227083df6c70ae238324e9270a33d373da38e3933f6b162933f5a16bd28ea"},
+    {file = "starlette-0.20.4-py3-none-any.whl", hash = "sha256:c0414d5a56297d37f3db96a84034d61ce29889b9eaccf65eb98a0b39441fcaa3"},
+    {file = "starlette-0.20.4.tar.gz", hash = "sha256:42fcf3122f998fefce3e2c5ad7e5edbf0f02cf685d646a83a08d404726af5084"},
 ]
 tomli = [
     {file = "tomli-1.2.3-py3-none-any.whl", hash = "sha256:e3069e4be3ead9668e21cb9b074cd948f7b3113fd9c8bba083f48247aab8b11c"},
