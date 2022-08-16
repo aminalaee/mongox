@@ -69,7 +69,7 @@ client = mongox.Client("mongodb://localhost:27017")
 db = client.get_database("test_db")
 
 
-class Movie(mongox.Model, db=db, collection="movies):
+class Movie(mongox.Model, db=db, collection="movies"):
     name: str
     year: int
 ```
