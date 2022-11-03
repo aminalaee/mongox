@@ -275,7 +275,7 @@ class ModelMetaClass(pydantic.main.ModelMetaclass):
         cls = super().__new__(mcs, name, bases, namespace)
 
         if kwargs:
-            cls.Meta = Meta
+            cls.Meta = Meta()
 
             assert "db" in kwargs, "DB instance required"
             assert isinstance(kwargs["db"], Database)
