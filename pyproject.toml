@@ -39,7 +39,7 @@ pydantic = "^1.8"
 pytest = "^7.1"
 isort = "^5.10.0"
 black = "^22.3"
-flake8 = "^4.0.1"
+flake8 = "^5.0.4"
 mypy = "^0.971"
 coverage = {extras = ["toml"], version = "^6.4"}
 mkdocs = "^1.2.4"
