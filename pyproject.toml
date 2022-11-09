@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "mongox"
-version = "0.1.0"
+version = "0.1.2"
 description = "Python Mongodb ODM using Motor and Pydantic"
 authors = ["Amin Alaee <mohammadamin.alaee@gmail.com>"]
 license = "MIT"
