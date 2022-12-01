@@ -293,11 +293,14 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "mkautodoc"
-version = "0.1.0"
+version = "0.2.0"
 description = "AutoDoc for MarkDown"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
+
+[package.dependencies]
+Markdown = "*"
 
 [[package]]
 name = "mkdocs"
@@ -698,7 +701,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<4.0"
-content-hash = "258d4ef4a90e9395e4a4b37ee727bd7fe12cb05f6f97e300bb280c265c40ee21"
+content-hash = "ade61950f2f4222165ecda3862b75a2410fa371c537d8972bde76d3f4f44d3e5"
 
 [metadata.files]
 anyio = [
@@ -922,7 +925,7 @@ mergedeep = [
     {file = "mergedeep-1.3.4.tar.gz", hash = "sha256:0096d52e9dad9939c3d975a774666af186eda617e6ca84df4c94dec30004f2a8"},
 ]
 mkautodoc = [
-    {file = "mkautodoc-0.1.0.tar.gz", hash = "sha256:7c2595f40276b356e576ce7e343338f8b4fa1e02ea904edf33fadf82b68ca67c"},
+    {file = "mkautodoc-0.2.0.tar.gz", hash = "sha256:b6e0c89804ba39d453ce5795eb040e5615756f90438ac04f47e97893a86a10cd"},
 ]
 mkdocs = [
     {file = "mkdocs-1.2.4-py3-none-any.whl", hash = "sha256:f108e7ab5a7ed3e30826dbf82f37638f0d90d11161644616cc4f01a1e2ab3940"},
